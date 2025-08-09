@@ -76,17 +76,17 @@ export function Header() {
   const currentPageTitle = breadcrumbMap[pathname] || "Page"
 
   return (
-    <header className="flex items-center justify-between px-6 py-4 bg-white shadow-sm border-b border-gray-200">
+    <header className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-red-600 via-pink-600 to-purple-600 text-white shadow-sm border-b border-red-300">
       {/* Page Title & Breadcrumb */}
       <div className="flex items-center space-x-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{currentPageTitle}</h1>
-          <div className="flex items-center text-sm text-gray-500 mt-1">
-            <span>SBA Compta</span>
-            <ChevronDown className="w-3 h-3 mx-1 rotate-[-90deg]" />
-            <span>RGPD</span>
-            <ChevronDown className="w-3 h-3 mx-1 rotate-[-90deg]" />
-            <span className="text-red-600 font-medium">{currentPageTitle}</span>
+          <h1 className="text-2xl font-bold text-white">{currentPageTitle}</h1>
+          <div className="flex items-center text-sm text-red-100 mt-1">
+            <span className="text-white">SBA Compta</span>
+            <ChevronDown className="w-3 h-3 mx-1 rotate-[-90deg] text-red-200" />
+            <span className="text-white">RGPD</span>
+            <ChevronDown className="w-3 h-3 mx-1 rotate-[-90deg] text-red-200" />
+            <span className="text-white font-semibold">{currentPageTitle}</span>
           </div>
         </div>
       </div>
@@ -94,7 +94,7 @@ export function Header() {
       {/* Right Section */}
       <div className="flex items-center space-x-4">
         {/* Help Button */}
-        <Button variant="ghost" size="sm" className="text-gray-500 hover:text-gray-700">
+        <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">
           <HelpCircle className="w-5 h-5" />
         </Button>
 
@@ -102,12 +102,12 @@ export function Header() {
         <Button
           variant="ghost"
           size="sm"
-          className="relative text-gray-500 hover:text-gray-700"
+          className="relative text-white hover:bg-white/10"
           onClick={() => router.push("/dashboard/alertes")}
         >
           <Bell className="w-5 h-5" />
           {alertCount > 0 && (
-            <Badge className="absolute -top-2 -right-2 px-1.5 min-w-[1.25rem] h-5 text-xs bg-red-500 hover:bg-red-600">
+            <Badge className="absolute -top-2 -right-2 px-1.5 min-w-[1.25rem] h-5 text-xs bg-yellow-300 text-black">
               {alertCount > 99 ? "99+" : alertCount}
             </Badge>
           )}
@@ -116,17 +116,17 @@ export function Header() {
         {/* User Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="flex items-center space-x-3 hover:bg-gray-50 px-3 py-2 rounded-lg">
+            <Button variant="ghost" className="flex items-center space-x-3 hover:bg-white/10 px-3 py-2 rounded-lg text-white">
               <Avatar className="w-8 h-8">
                 <AvatarFallback className="bg-red-100 text-red-700 text-sm font-semibold">
                   {getInitials(user?.nom)}
                 </AvatarFallback>
               </Avatar>
               <div className="text-left hidden md:block">
-                <div className="text-sm font-medium text-gray-900">{user?.nom || "Utilisateur"}</div>
-                <div className="text-xs text-gray-500">{user?.role || "Collaborateur"}</div>
+                <div className="text-sm font-medium text-white">{user?.nom || "Utilisateur"}</div>
+                <div className="text-xs text-red-100">{user?.role || "Collaborateur"}</div>
               </div>
-              <ChevronDown className="w-4 h-4 text-gray-400" />
+              <ChevronDown className="w-4 h-4 text-red-200" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
