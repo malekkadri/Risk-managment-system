@@ -5,6 +5,7 @@ import "./globals.css"
 import "../styles/animations.css"
 import "../styles/components.css"
 import { cn } from "@/lib/utils"
+import ThemeLogger from "@/components/theme-logger"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -108,6 +109,7 @@ export default function RootLayout({
         <meta name="msapplication-TileColor" content="#a855f7" />
       </head>
       <body className={cn("min-h-screen bg-background font-sans antialiased", inter.variable, jetbrainsMono.variable)}>
+        <ThemeLogger />
         <div id="root">{children}</div>
         <div id="portal-root" />
       </body>
