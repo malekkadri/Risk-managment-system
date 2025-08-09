@@ -49,7 +49,8 @@ Ouvrez le fichier `.env.local` avec un éditeur de texte (comme Notepad, VS Code
 \`\`\`env
 # Configuration Next.js
 NEXT_PUBLIC_APP_URL=http://localhost:3000
-NEXT_PUBLIC_API_URL=http://localhost:5000
+NEXT_PUBLIC_API_URL=http://localhost:3001
+
 
 # Configuration de développement
 NODE_ENV=development
