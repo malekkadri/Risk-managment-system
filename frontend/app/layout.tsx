@@ -1,7 +1,7 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
 import { Inter, JetBrains_Mono } from "next/font/google"
-import "./globals.css"
+import "../styles/globals.css"; // <-- path must be correct
 import "../styles/animations.css"
 import "../styles/components.css"
 import { cn } from "@/lib/utils"

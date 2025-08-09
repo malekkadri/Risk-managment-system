@@ -174,9 +174,8 @@ Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
 ## 📞 Support
 
 Pour toute question ou support technique :
-- Email: support@smart-dpo.com
-- Documentation: [docs.smart-dpo.com](https://docs.smart-dpo.com)
-- Issues GitHub: [github.com/smart-dpo/issues](https://github.com/smart-dpo/issues)
+- Email: malek.kadri100@gmail.com
+- Issues GitHub: [github.com/malekkadri/Risk-managment-system-/issues](https://github.com/malekkadri/Risk-managment-system-/issues)
 
 ---
 
