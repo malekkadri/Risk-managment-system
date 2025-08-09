@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { API_BASE_URL } from "@/lib/api"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -17,7 +18,7 @@ export default function AlertesPage() {
   const fetchAlertes = async () => {
     try {
       const token = localStorage.getItem("token")
-      const res = await fetch("http://localhost:3001/api/alertes", {
+      const res = await fetch(`${API_BASE_URL}/api/alertes`, {
         headers: { "x-auth-token": token || "" },
       })
       if (res.ok) {
@@ -34,7 +35,7 @@ export default function AlertesPage() {
   const markAsRead = async (id: number) => {
     try {
       const token = localStorage.getItem("token")
-      const res = await fetch(`http://localhost:3001/api/alertes/${id}/read`, {
+      const res = await fetch(`${API_BASE_URL}/api/alertes/${id}/read`, {
         method: "PUT",
         headers: { "x-auth-token": token || "" },
       })

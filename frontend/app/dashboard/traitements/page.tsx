@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { API_BASE_URL } from "@/lib/api"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -32,7 +33,7 @@ export default function TraitementsPage() {
   const fetchTraitements = async () => {
     try {
       const token = localStorage.getItem("token")
-      const res = await fetch("http://localhost:3001/api/traitements", {
+      const res = await fetch(`${API_BASE_URL}/api/traitements`, {
         headers: { "x-auth-token": token || "" },
       })
       if (res.ok) {
@@ -72,7 +73,7 @@ export default function TraitementsPage() {
     if (confirm("Êtes-vous sûr de vouloir supprimer ce traitement ?")) {
       try {
         const token = localStorage.getItem("token")
-        const res = await fetch(`http://localhost:3001/api/traitements/${id}`, {
+        const res = await fetch(`${API_BASE_URL}/api/traitements/${id}`, {
           method: "DELETE",
           headers: { "x-auth-token": token || "" },
         })

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { API_BASE_URL } from "@/lib/api"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
@@ -25,7 +26,7 @@ export default function JournalPage() {
   const fetchActions = async () => {
     try {
       const token = localStorage.getItem("token")
-      const res = await fetch("http://localhost:3001/api/journal", {
+      const res = await fetch(`${API_BASE_URL}/api/journal`, {
         headers: { "x-auth-token": token || "" },
       })
       if (res.ok) {

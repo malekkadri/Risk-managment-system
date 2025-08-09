@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
+import { API_BASE_URL } from "@/lib/api"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -71,7 +72,7 @@ export function RisqueDialog({ open, onOpenChange, risque, onSuccess }: RisqueDi
   const fetchTraitements = async () => {
     try {
       const token = localStorage.getItem("token")
-      const res = await fetch("http://localhost:3001/api/traitements", {
+      const res = await fetch(`${API_BASE_URL}/api/traitements`, {
         headers: { "x-auth-token": token || "" },
       })
       if (res.ok) {
@@ -89,7 +90,9 @@ export function RisqueDialog({ open, onOpenChange, risque, onSuccess }: RisqueDi
 
     try {
       const token = localStorage.getItem("token")
-      const url = risque ? `http://localhost:3001/api/risques/${risque.id}` : "http://localhost:3001/api/risques"
+      const url = risque
+        ? `${API_BASE_URL}/api/risques/${risque.id}`
+        : `${API_BASE_URL}/api/risques`
 
       const method = risque ? "PUT" : "POST"
 

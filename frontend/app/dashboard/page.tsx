@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { API_BASE_URL } from "@/lib/api"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
@@ -48,8 +49,8 @@ export default function DashboardPage() {
       const headers = { "x-auth-token": token || "" }
 
       const [statsRes, evolutionRes] = await Promise.all([
-        fetch("http://localhost:3001/api/dashboard/stats", { headers }),
-        fetch("http://localhost:3001/api/dashboard/evolution", { headers }),
+        fetch(`${API_BASE_URL}/api/dashboard/stats`, { headers }),
+        fetch(`${API_BASE_URL}/api/dashboard/evolution`, { headers }),
       ])
 
       if (statsRes.ok && evolutionRes.ok) {

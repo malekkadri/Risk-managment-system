@@ -1,150 +1,108 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Progress } from "@/components/ui/progress"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Search, Shield, CheckCircle, AlertTriangle, Clock, Filter } from "lucide-react"
+import { Plus, Search, Shield, CheckCircle, AlertTriangle, Clock, Edit } from "lucide-react"
+import { API_BASE_URL } from "@/lib/api"
+import { MesureDialog } from "@/components/mesure-dialog"
 
 export default function MesuresPage() {
+  const [mesures, setMesures] = useState<any[]>([])
+  const [filteredMesures, setFilteredMesures] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [filterStatus, setFilterStatus] = useState("all")
+  const [showDialog, setShowDialog] = useState(false)
+  const [editingMesure, setEditingMesure] = useState<any>(null)
 
-  const mesures = [
-    {
-      id: 1,
-      nom: "Chiffrement des données",
-      description: "Mise en place du chiffrement AES-256 pour toutes les données sensibles",
-      statut: "active",
-      priorite: "haute",
-      progression: 100,
-      dateCreation: "2024-01-15",
-      dateEcheance: "2024-02-15",
-      responsable: "Jean Dupont",
-      cout: "15000€",
-    },
-    {
-      id: 2,
-      nom: "Formation RGPD équipes",
-      description: "Programme de formation obligatoire pour tous les employés",
-      statut: "en_cours",
-      priorite: "moyenne",
-      progression: 65,
-      dateCreation: "2024-01-20",
-      dateEcheance: "2024-03-01",
-      responsable: "Marie Martin",
-      cout: "8000€",
-    },
-    {
-      id: 3,
-      nom: "Audit de sécurité",
-      description: "Audit complet des systèmes d'information et des processus",
-      statut: "planifie",
-      priorite: "haute",
-      progression: 0,
-      dateCreation: "2024-02-01",
-      dateEcheance: "2024-04-01",
-      responsable: "Pierre Durand",
-      cout: "25000€",
-    },
-    {
-      id: 4,
-      nom: "Mise à jour politique confidentialité",
-      description: "Révision et mise à jour de la politique de confidentialité",
-      statut: "active",
-      priorite: "faible",
-      progression: 90,
-      dateCreation: "2024-01-10",
-      dateEcheance: "2024-02-10",
-      responsable: "Sophie Leroy",
-      cout: "2000€",
-    },
-  ]
+  useEffect(() => {
+    fetchMesures()
+  }, [])
+
+  useEffect(() => {
+    filterMesures()
+  }, [mesures, searchTerm, filterStatus])
+
+  const fetchMesures = async () => {
+    try {
+      const token = localStorage.getItem("token")
+      const res = await fetch(`${API_BASE_URL}/api/mesures`, {
+        headers: { "x-auth-token": token || "" },
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setMesures(data)
+      }
+    } catch (error) {
+      console.error("Erreur lors de la récupération des mesures:", error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const filterMesures = () => {
+    let filtered = mesures
+
+    if (searchTerm) {
+      filtered = filtered.filter(
+        (m) =>
+          m.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          m.nom_traitement.toLowerCase().includes(searchTerm.toLowerCase()),
+      )
+    }
+
+    if (filterStatus !== "all") {
+      filtered = filtered.filter((m) => m.statut === filterStatus)
+    }
+
+    setFilteredMesures(filtered)
+  }
 
   const getStatusBadge = (statut: string) => {
     switch (statut) {
-      case "active":
-        return (
-          <Badge className="bg-green-100 text-green-800 hover:bg-green-200">
-            <CheckCircle className="w-3 h-3 mr-1" />
-            Active
-          </Badge>
-        )
-      case "en_cours":
-        return (
-          <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200">
-            <Clock className="w-3 h-3 mr-1" />
-            En cours
-          </Badge>
-        )
-      case "planifie":
-        return (
-          <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-200">
-            <AlertTriangle className="w-3 h-3 mr-1" />
-            Planifié
-          </Badge>
-        )
+      case "Terminée":
+        return <Badge className="bg-green-100 text-green-800">Terminée</Badge>
+      case "En cours":
+        return <Badge className="bg-blue-100 text-blue-800">En cours</Badge>
+      case "Reportée":
+        return <Badge className="bg-yellow-100 text-yellow-800">Reportée</Badge>
+      case "À faire":
+        return <Badge variant="secondary">À faire</Badge>
       default:
-        return <Badge variant="secondary">Inconnu</Badge>
+        return <Badge variant="secondary">{statut}</Badge>
     }
   }
 
   const getPriorityBadge = (priorite: string) => {
     switch (priorite) {
-      case "haute":
-        return <Badge variant="destructive">Haute</Badge>
-      case "moyenne":
-        return <Badge className="bg-orange-100 text-orange-800 hover:bg-orange-200">Moyenne</Badge>
-      case "faible":
-        return <Badge variant="secondary">Faible</Badge>
+      case "Critique":
+        return <Badge variant="destructive">Critique</Badge>
+      case "Haute":
+        return <Badge className="bg-red-100 text-red-800">Haute</Badge>
+      case "Moyenne":
+        return <Badge className="bg-orange-100 text-orange-800">Moyenne</Badge>
+      case "Basse":
+        return <Badge variant="secondary">Basse</Badge>
       default:
-        return <Badge variant="secondary">-</Badge>
+        return <Badge variant="secondary">{priorite}</Badge>
     }
   }
 
-  const filteredMesures = mesures.filter((mesure) => {
-    const matchesSearch =
-      mesure.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      mesure.description.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesFilter = filterStatus === "all" || mesure.statut === filterStatus
-    return matchesSearch && matchesFilter
-  })
-
   const stats = [
     { title: "Total Mesures", value: mesures.length, icon: Shield, color: "text-blue-600" },
-    {
-      title: "Actives",
-      value: mesures.filter((m) => m.statut === "active").length,
-      icon: CheckCircle,
-      color: "text-green-600",
-    },
-    {
-      title: "En Cours",
-      value: mesures.filter((m) => m.statut === "en_cours").length,
-      icon: Clock,
-      color: "text-orange-600",
-    },
-    {
-      title: "Planifiées",
-      value: mesures.filter((m) => m.statut === "planifie").length,
-      icon: AlertTriangle,
-      color: "text-yellow-600",
-    },
+    { title: "En cours", value: mesures.filter((m) => m.statut === "En cours").length, icon: Clock, color: "text-orange-600" },
+    { title: "Terminées", value: mesures.filter((m) => m.statut === "Terminée").length, icon: CheckCircle, color: "text-green-600" },
+    { title: "À faire", value: mesures.filter((m) => m.statut === "À faire").length, icon: AlertTriangle, color: "text-yellow-600" },
   ]
+
+  if (loading) {
+    return <div className="p-6">Chargement...</div>
+  }
 
   return (
     <div className="space-y-6">
@@ -153,82 +111,20 @@ export default function MesuresPage() {
           <h1 className="text-3xl font-bold text-gray-900">Mesures de Sécurité</h1>
           <p className="text-gray-600 mt-2">Gestion et suivi des mesures de protection des données</p>
         </div>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button className="bg-purple-600 hover:bg-purple-700">
-              <Plus className="mr-2 h-4 w-4" />
-              Nouvelle Mesure
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>Créer une nouvelle mesure</DialogTitle>
-              <DialogDescription>
-                Ajoutez une nouvelle mesure de sécurité pour améliorer votre conformité RGPD.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="nom">Nom de la mesure</Label>
-                  <Input id="nom" placeholder="Ex: Chiffrement des données" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="priorite">Priorité</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="haute">Haute</SelectItem>
-                      <SelectItem value="moyenne">Moyenne</SelectItem>
-                      <SelectItem value="faible">Faible</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea id="description" placeholder="Décrivez la mesure en détail..." />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="responsable">Responsable</Label>
-                  <Input id="responsable" placeholder="Nom du responsable" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="cout">Coût estimé</Label>
-                  <Input id="cout" placeholder="Ex: 10000€" />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="dateDebut">Date de début</Label>
-                  <Input id="dateDebut" type="date" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="dateEcheance">Date d'échéance</Label>
-                  <Input id="dateEcheance" type="date" />
-                </div>
-              </div>
-            </div>
-            <div className="flex justify-end space-x-2">
-              <Button variant="outline">Annuler</Button>
-              <Button className="bg-purple-600 hover:bg-purple-700">Créer la mesure</Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+        <Button className="bg-purple-600 hover:bg-purple-700" onClick={() => setShowDialog(true)}>
+          <Plus className="mr-2 h-4 w-4" />
+          Nouvelle Mesure
+        </Button>
       </div>
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => (
-          <Card key={index} className="bg-white border-gray-200">
+        {stats.map((stat) => (
+          <Card key={stat.title}>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                  <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">{stat.title}</p>
+                  <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
                 </div>
                 <stat.icon className={`h-8 w-8 ${stat.color}`} />
               </div>
@@ -237,86 +133,97 @@ export default function MesuresPage() {
         ))}
       </div>
 
-      {/* Filters */}
-      <Card className="bg-white border-gray-200">
+      <Card>
         <CardContent className="p-6">
           <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  placeholder="Rechercher une mesure..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Rechercher une mesure..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
             </div>
-            <div className="flex gap-2">
-              <Select value={filterStatus} onValueChange={setFilterStatus}>
-                <SelectTrigger className="w-40">
-                  <Filter className="mr-2 h-4 w-4" />
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tous les statuts</SelectItem>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="en_cours">En cours</SelectItem>
-                  <SelectItem value="planifie">Planifié</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <Select value={filterStatus} onValueChange={setFilterStatus}>
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="Statut" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tous les statuts</SelectItem>
+                <SelectItem value="À faire">À faire</SelectItem>
+                <SelectItem value="En cours">En cours</SelectItem>
+                <SelectItem value="Terminée">Terminée</SelectItem>
+                <SelectItem value="Reportée">Reportée</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </CardContent>
       </Card>
 
-      {/* Mesures Table */}
-      <Card className="bg-white border-gray-200">
+      <Card>
         <CardHeader>
           <CardTitle>Liste des Mesures</CardTitle>
-          <CardDescription>{filteredMesures.length} mesure(s) trouvée(s)</CardDescription>
+          <CardDescription>Toutes les mesures correctives enregistrées</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Mesure</TableHead>
-                <TableHead>Statut</TableHead>
+                <TableHead>Traitement</TableHead>
+                <TableHead>Description</TableHead>
+                <TableHead>Type</TableHead>
                 <TableHead>Priorité</TableHead>
-                <TableHead>Progression</TableHead>
-                <TableHead>Responsable</TableHead>
+                <TableHead>Statut</TableHead>
                 <TableHead>Échéance</TableHead>
-                <TableHead>Coût</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredMesures.map((mesure) => (
-                <TableRow key={mesure.id} className="hover:bg-gray-50">
+                <TableRow key={mesure.id}>
+                  <TableCell className="font-medium">{mesure.nom_traitement}</TableCell>
+                  <TableCell>{mesure.description}</TableCell>
                   <TableCell>
-                    <div>
-                      <div className="font-medium text-gray-900">{mesure.nom}</div>
-                      <div className="text-sm text-gray-500">{mesure.description}</div>
-                    </div>
+                    <Badge variant="outline">{mesure.type_mesure}</Badge>
                   </TableCell>
-                  <TableCell>{getStatusBadge(mesure.statut)}</TableCell>
                   <TableCell>{getPriorityBadge(mesure.priorite)}</TableCell>
+                  <TableCell>{getStatusBadge(mesure.statut)}</TableCell>
                   <TableCell>
-                    <div className="w-full">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm text-gray-600">{mesure.progression}%</span>
-                      </div>
-                      <Progress value={mesure.progression} className="h-2" />
-                    </div>
+                    {mesure.date_echeance
+                      ? new Date(mesure.date_echeance).toLocaleDateString("fr-FR")
+                      : "-"}
                   </TableCell>
-                  <TableCell className="text-gray-900">{mesure.responsable}</TableCell>
-                  <TableCell className="text-gray-600">{mesure.dateEcheance}</TableCell>
-                  <TableCell className="font-medium text-gray-900">{mesure.cout}</TableCell>
+                  <TableCell>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setEditingMesure(mesure)
+                        setShowDialog(true)
+                      }}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
+
+      <MesureDialog
+        open={showDialog}
+        onOpenChange={setShowDialog}
+        mesure={editingMesure}
+        onSuccess={() => {
+          fetchMesures()
+          setShowDialog(false)
+          setEditingMesure(null)
+        }}
+      />
     </div>
   )
 }
+

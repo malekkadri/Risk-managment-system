@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
+import { API_BASE_URL } from "@/lib/api"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -77,8 +78,8 @@ export function TraitementDialog({ open, onOpenChange, traitement, onSuccess }: 
     try {
       const token = localStorage.getItem("token")
       const url = traitement
-        ? `http://localhost:3001/api/traitements/${traitement.id}`
-        : "http://localhost:3001/api/traitements"
+        ? `${API_BASE_URL}/api/traitements/${traitement.id}`
+        : `${API_BASE_URL}/api/traitements`
 
       const method = traitement ? "PUT" : "POST"
 

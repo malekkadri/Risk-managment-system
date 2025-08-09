@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { API_BASE_URL } from "@/lib/api"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -29,7 +30,7 @@ export default function UsersPage() {
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem("token")
-      const res = await fetch("http://localhost:3001/api/users", {
+      const res = await fetch(`${API_BASE_URL}/api/users`, {
         headers: { "x-auth-token": token || "" },
       })
       if (res.ok) {
@@ -61,7 +62,7 @@ export default function UsersPage() {
     if (confirm("Êtes-vous sûr de vouloir supprimer cet utilisateur ?")) {
       try {
         const token = localStorage.getItem("token")
-        const res = await fetch(`http://localhost:3001/api/users/${id}`, {
+        const res = await fetch(`${API_BASE_URL}/api/users/${id}`, {
           method: "DELETE",
           headers: { "x-auth-token": token || "" },
         })
