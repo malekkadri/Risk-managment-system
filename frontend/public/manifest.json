@@ -1,0 +1,27 @@
+{
+  "name": "SBA Compta RGPD",
+  "short_name": "SBA RGPD",
+  "description": "Solution complète de gestion intelligente des risques RGPD",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#a855f7",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/images/sba-logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/sba-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "productivity", "utilities"],
+  "lang": "fr",
+  "dir": "ltr"
+}
