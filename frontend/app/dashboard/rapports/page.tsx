@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { API_BASE_URL } from "@/lib/api"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -13,7 +14,7 @@ export default function RapportsPage() {
     setLoading(`${type}-${format}`)
     try {
       const token = localStorage.getItem("token")
-      const response = await fetch(`http://localhost:3001/api/rapports/${type}/${format}`, {
+      const response = await fetch(`${API_BASE_URL}/api/rapports/${type}/${format}`, {
         headers: { "x-auth-token": token || "" },
       })
 

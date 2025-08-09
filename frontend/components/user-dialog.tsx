@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
+import { API_BASE_URL } from "@/lib/api"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -60,7 +61,9 @@ export function UserDialog({ open, onOpenChange, user, onSuccess }: UserDialogPr
 
     try {
       const token = localStorage.getItem("token")
-      const url = user ? `http://localhost:3001/api/users/${user.id}` : "http://localhost:3001/api/users"
+      const url = user
+        ? `${API_BASE_URL}/api/users/${user.id}`
+        : `${API_BASE_URL}/api/users`
       const method = user ? "PUT" : "POST"
 
       const payload = user

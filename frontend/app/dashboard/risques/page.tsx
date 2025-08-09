@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { API_BASE_URL } from "@/lib/api"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -21,7 +22,7 @@ export default function RisquesPage() {
   const fetchRisques = async () => {
     try {
       const token = localStorage.getItem("token")
-      const res = await fetch("http://localhost:3001/api/risques", {
+      const res = await fetch(`${API_BASE_URL}/api/risques`, {
         headers: { "x-auth-token": token || "" },
       })
       if (res.ok) {
