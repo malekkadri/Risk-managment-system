@@ -65,6 +65,9 @@ npm install
 cp .env.example .env
 # Configurer les variables d'environnement
 npm start
+
+# Importer les traitements depuis l'Excel (optionnel)
+npm run import:excel
 \`\`\`
 
 ### 3. Frontend
