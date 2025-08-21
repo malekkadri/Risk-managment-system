@@ -258,7 +258,7 @@ router.delete(
 router.post(
   "/import",
   auth,
-  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur"),
+  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur", "Rapport"),
   upload.single("file"),
   async (req, res) => {
     try {
