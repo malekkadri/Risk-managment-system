@@ -6,7 +6,7 @@ const auth = require("../middleware/auth")
 const authorize = require("../middleware/authorize")
 
 // Obtenir tous les utilisateurs
-router.get("/", auth, authorize("Admin", "DPO", "SuperAdmin"), async (req, res) => {
+router.get("/", auth, authorize("Admin", "DPO", "SuperAdmin", "Rapport"), async (req, res) => {
   try {
     const [users] = await db.query("SELECT id, nom, role, email, actif, cree_le FROM Utilisateur ORDER BY nom")
     res.json(users)
@@ -17,7 +17,7 @@ router.get("/", auth, authorize("Admin", "DPO", "SuperAdmin"), async (req, res) 
 })
 
 // Créer un utilisateur
-router.post("/", auth, authorize("Admin", "DPO", "SuperAdmin"), async (req, res) => {
+router.post("/", auth, authorize("Admin", "DPO", "SuperAdmin", "Rapport"), async (req, res) => {
   const { nom, role, email, mot_de_passe } = req.body
 
   try {
@@ -50,7 +50,7 @@ router.post("/", auth, authorize("Admin", "DPO", "SuperAdmin"), async (req, res)
 })
 
 // Mettre à jour un utilisateur
-router.put("/:id", auth, authorize("Admin", "DPO", "SuperAdmin"), async (req, res) => {
+router.put("/:id", auth, authorize("Admin", "DPO", "SuperAdmin", "Rapport"), async (req, res) => {
   const { nom, role, email, actif } = req.body
 
   try {

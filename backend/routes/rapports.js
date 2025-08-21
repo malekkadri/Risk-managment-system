@@ -7,7 +7,7 @@ const PDFDocument = require("pdfkit")
 const XLSX = require("xlsx")
 
 // Générer un rapport de conformité
-router.get("/conformite", auth, authorize("Admin", "DPO", "SuperAdmin"), async (req, res) => {
+router.get("/conformite", auth, authorize("Admin", "DPO", "SuperAdmin", "Rapport"), async (req, res) => {
   try {
     const [traitements] = await db.query(`
       SELECT t.*, COUNT(r.id) as nombre_risques, AVG(r.score_risque) as score_moyen
@@ -148,7 +148,7 @@ function exportReport(type, format, data, title, res) {
 router.get(
   "/conformite/:format",
   auth,
-  authorize("Admin", "DPO", "SuperAdmin"),
+  authorize("Admin", "DPO", "SuperAdmin", "Rapport"),
   async (req, res) => {
     try {
       const { data, title } = await buildReport("conformite")
@@ -163,7 +163,7 @@ router.get(
 router.get(
   "/risques/:format",
   auth,
-  authorize("Admin", "DPO", "SuperAdmin"),
+  authorize("Admin", "DPO", "SuperAdmin", "Rapport"),
   async (req, res) => {
     try {
       const { data, title } = await buildReport("risques")
@@ -178,7 +178,7 @@ router.get(
 router.get(
   "/activite/:format",
   auth,
-  authorize("Admin", "DPO", "SuperAdmin"),
+  authorize("Admin", "DPO", "SuperAdmin", "Rapport"),
   async (req, res) => {
     try {
       const { data, title } = await buildReport("activite")
