@@ -59,7 +59,7 @@ const navigation = [
     name: "Rapports",
     href: "/dashboard/rapports",
     icon: Download,
-    roles: ["Admin", "DPO", "SuperAdmin", "Rapport"],
+    roles: ["Admin", "DPO", "SuperAdmin", "Collaborateur", "Rapport"],
   },
   { name: "Paramètres", href: "/dashboard/settings", icon: Settings, roles: ["Admin", "DPO", "SuperAdmin"] },
 ]

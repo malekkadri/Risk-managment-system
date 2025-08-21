@@ -11,7 +11,7 @@ import { useRoleGuard } from "@/hooks/useRoleGuard"
 export default function RapportsPage() {
   const [loading, setLoading] = useState<string | null>(null)
   const [file, setFile] = useState<File | null>(null)
-  useRoleGuard(["Admin", "DPO", "SuperAdmin", "Rapport"])
+  useRoleGuard(["Admin", "DPO", "SuperAdmin", "Collaborateur", "Rapport"])
 
   const handleExport = async (type: string, format: string) => {
     setLoading(`${type}-${format}`)
