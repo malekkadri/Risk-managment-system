@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { API_BASE_URL } from "@/lib/api"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -19,7 +20,25 @@ export default function UsersPage() {
   const [showDialog, setShowDialog] = useState(false)
   const [editingUser, setEditingUser] = useState<any>(null)
 
+  const router = useRouter()
+
   useEffect(() => {
+    const stored = localStorage.getItem("user")
+    if (stored) {
+      try {
+        const current = JSON.parse(stored)
+        if (current.role === "Rapport" || current.role === "Collaborateur") {
+          router.push("/dashboard")
+          return
+        }
+      } catch {
+        router.push("/login")
+        return
+      }
+    } else {
+      router.push("/login")
+      return
+    }
     fetchUsers()
   }, [])
 
