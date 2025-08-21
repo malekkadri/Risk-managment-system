@@ -2,9 +2,14 @@ const express = require("express")
 const router = express.Router()
 const db = require("../config/db")
 const auth = require("../middleware/auth")
+const authorize = require("../middleware/authorize")
 
 // Obtenir tous les risques
-router.get("/", auth, async (req, res) => {
+router.get(
+  "/",
+  auth,
+  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur"),
+  async (req, res) => {
   try {
     const [risques] = await db.query(`
       SELECT r.*, t.nom as nom_traitement, t.pole
@@ -17,10 +22,15 @@ router.get("/", auth, async (req, res) => {
     console.error(err.message)
     res.status(500).send("Erreur serveur")
   }
-})
+  },
+)
 
 // Créer un risque
-router.post("/", auth, async (req, res) => {
+router.post(
+  "/",
+  auth,
+  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur"),
+  async (req, res) => {
   const { traitement_id, type_risque, criticite, probabilite, impact, vulnerabilites, commentaire } = req.body
 
   try {
@@ -47,10 +57,15 @@ router.post("/", auth, async (req, res) => {
     console.error(err.message)
     res.status(500).send("Erreur serveur")
   }
-})
+  },
+)
 
 // Mettre à jour un risque
-router.put("/:id", auth, async (req, res) => {
+router.put(
+  "/:id",
+  auth,
+  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur"),
+  async (req, res) => {
   const { type_risque, criticite, probabilite, impact, statut, vulnerabilites, commentaire } = req.body
 
   try {
@@ -79,6 +94,7 @@ router.put("/:id", auth, async (req, res) => {
     console.error(err.message)
     res.status(500).send("Erreur serveur")
   }
-})
+  },
+)
 
 module.exports = router

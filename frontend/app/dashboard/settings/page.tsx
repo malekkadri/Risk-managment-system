@@ -20,6 +20,7 @@ import {
   CheckCircle,
   Info,
 } from "lucide-react"
+import { useRoleGuard } from "@/hooks/useRoleGuard"
 
 export default function SettingsPage() {
   const [settings, setSettings] = useState({
@@ -53,6 +54,7 @@ export default function SettingsPage() {
 
   const [loading, setLoading] = useState(false)
   const [saved, setSaved] = useState(false)
+  useRoleGuard(["Admin", "DPO", "SuperAdmin"])
 
   const handleSave = async () => {
     setLoading(true)

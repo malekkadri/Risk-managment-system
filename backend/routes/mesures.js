@@ -2,9 +2,14 @@ const express = require("express")
 const router = express.Router()
 const db = require("../config/db")
 const auth = require("../middleware/auth")
+const authorize = require("../middleware/authorize")
 
 // Obtenir toutes les mesures correctives
-router.get("/", auth, async (req, res) => {
+router.get(
+  "/",
+  auth,
+  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur"),
+  async (req, res) => {
   try {
     const [mesures] = await db.query(`
       SELECT mc.*, r.traitement_id, t.nom as nom_traitement, u.nom as nom_responsable
@@ -19,10 +24,15 @@ router.get("/", auth, async (req, res) => {
     console.error(err.message)
     res.status(500).send("Erreur serveur")
   }
-})
+  },
+)
 
 // Créer une mesure corrective
-router.post("/", auth, async (req, res) => {
+router.post(
+  "/",
+  auth,
+  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur"),
+  async (req, res) => {
   const { risque_id, description, type_mesure, priorite, responsable_id, date_echeance, cout_estime } = req.body
 
   try {
@@ -50,10 +60,15 @@ router.post("/", auth, async (req, res) => {
     console.error(err.message)
     res.status(500).send("Erreur serveur")
   }
-})
+  },
+)
 
 // Mettre à jour une mesure corrective
-router.put("/:id", auth, async (req, res) => {
+router.put(
+  "/:id",
+  auth,
+  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur"),
+  async (req, res) => {
   const { description, type_mesure, priorite, statut, responsable_id, date_echeance, cout_estime } = req.body
 
   try {
@@ -72,6 +87,7 @@ router.put("/:id", auth, async (req, res) => {
     console.error(err.message)
     res.status(500).send("Erreur serveur")
   }
-})
+  },
+)
 
 module.exports = router

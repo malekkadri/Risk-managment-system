@@ -6,14 +6,18 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { AlertTriangle, CheckCircle, Info, Clock } from "lucide-react"
+import { useRoleGuard } from "@/hooks/useRoleGuard"
 
 export default function AlertesPage() {
   const [alertes, setAlertes] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const role = useRoleGuard(["Admin", "DPO", "SuperAdmin", "Collaborateur"])
 
   useEffect(() => {
-    fetchAlertes()
-  }, [])
+    if (role) {
+      fetchAlertes()
+    }
+  }, [role])
 
   const fetchAlertes = async () => {
     try {

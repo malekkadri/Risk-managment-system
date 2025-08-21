@@ -18,14 +18,49 @@ import {
 } from "lucide-react"
 
 const navigation = [
-  { name: "Tableau de bord", href: "/dashboard", icon: BarChart3 },
-  { name: "Traitements", href: "/dashboard/traitements", icon: FileText },
-  { name: "Risques", href: "/dashboard/risques", icon: AlertTriangle },
-  { name: "Mesures correctives", href: "/dashboard/mesures", icon: ShieldCheck },
+  {
+    name: "Tableau de bord",
+    href: "/dashboard",
+    icon: BarChart3,
+    roles: ["Admin", "DPO", "SuperAdmin", "Collaborateur", "Rapport"],
+  },
+  {
+    name: "Traitements",
+    href: "/dashboard/traitements",
+    icon: FileText,
+    roles: ["Admin", "DPO", "SuperAdmin", "Collaborateur"],
+  },
+  {
+    name: "Risques",
+    href: "/dashboard/risques",
+    icon: AlertTriangle,
+    roles: ["Admin", "DPO", "SuperAdmin", "Collaborateur"],
+  },
+  {
+    name: "Mesures correctives",
+    href: "/dashboard/mesures",
+    icon: ShieldCheck,
+    roles: ["Admin", "DPO", "SuperAdmin", "Collaborateur"],
+  },
   { name: "Utilisateurs", href: "/dashboard/users", icon: Users, roles: ["Admin", "DPO", "SuperAdmin"] },
-  { name: "Alertes", href: "/dashboard/alertes", icon: Bell },
-  { name: "Journal", href: "/dashboard/journal", icon: BookOpen },
-  { name: "Rapports", href: "/dashboard/rapports", icon: Download },
+  {
+    name: "Alertes",
+    href: "/dashboard/alertes",
+    icon: Bell,
+    roles: ["Admin", "DPO", "SuperAdmin", "Collaborateur"],
+  },
+  {
+    name: "Journal",
+    href: "/dashboard/journal",
+    icon: BookOpen,
+    roles: ["Admin", "DPO", "SuperAdmin"],
+  },
+  {
+    name: "Rapports",
+    href: "/dashboard/rapports",
+    icon: Download,
+    roles: ["Admin", "DPO", "SuperAdmin", "Rapport"],
+  },
   { name: "Paramètres", href: "/dashboard/settings", icon: Settings, roles: ["Admin", "DPO", "SuperAdmin"] },
 ]
 

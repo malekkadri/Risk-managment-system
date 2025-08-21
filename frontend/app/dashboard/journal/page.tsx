@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Search, Activity, FileText, AlertTriangle, Shield, Calendar, User } from "lucide-react"
+import { useRoleGuard } from "@/hooks/useRoleGuard"
 
 export default function JournalPage() {
   const [actions, setActions] = useState<any[]>([])
@@ -15,9 +16,13 @@ export default function JournalPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [actionFilter, setActionFilter] = useState("all")
 
+  const role = useRoleGuard(["Admin", "DPO", "SuperAdmin"])
+
   useEffect(() => {
-    fetchActions()
-  }, [])
+    if (role) {
+      fetchActions()
+    }
+  }, [role])
 
   useEffect(() => {
     filterActions()

@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus, Search, Shield, CheckCircle, AlertTriangle, Clock, Edit } from "lucide-react"
 import { API_BASE_URL } from "@/lib/api"
 import { MesureDialog } from "@/components/mesure-dialog"
+import { useRoleGuard } from "@/hooks/useRoleGuard"
 
 export default function MesuresPage() {
   const [mesures, setMesures] = useState<any[]>([])
@@ -19,10 +20,13 @@ export default function MesuresPage() {
   const [filterStatus, setFilterStatus] = useState("all")
   const [showDialog, setShowDialog] = useState(false)
   const [editingMesure, setEditingMesure] = useState<any>(null)
+  const role = useRoleGuard(["Admin", "DPO", "SuperAdmin", "Collaborateur"])
 
   useEffect(() => {
-    fetchMesures()
-  }, [])
+    if (role) {
+      fetchMesures()
+    }
+  }, [role])
 
   useEffect(() => {
     filterMesures()
