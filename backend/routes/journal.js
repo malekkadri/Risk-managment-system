@@ -2,9 +2,10 @@ const express = require("express")
 const router = express.Router()
 const db = require("../config/db")
 const auth = require("../middleware/auth")
+const authorize = require("../middleware/authorize")
 
 // Obtenir l'historique des actions
-router.get("/", auth, async (req, res) => {
+router.get("/", auth, authorize("Admin", "DPO", "SuperAdmin"), async (req, res) => {
   try {
     const [actions] = await db.query(`
       SELECT ja.*, u.nom as nom_utilisateur, t.nom as nom_traitement

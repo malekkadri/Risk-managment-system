@@ -6,12 +6,15 @@ import { API_BASE_URL } from "@/lib/api"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useRoleGuard } from "@/hooks/useRoleGuard"
 
 export default function TraitementDetailsPage({ params }: { params: { id: string } }) {
   const [traitement, setTraitement] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const role = useRoleGuard(["Admin", "DPO", "SuperAdmin", "Collaborateur"])
 
   useEffect(() => {
+    if (!role) return
     const fetchTraitement = async () => {
       try {
         const token = localStorage.getItem("token")
@@ -30,7 +33,7 @@ export default function TraitementDetailsPage({ params }: { params: { id: string
     }
 
     fetchTraitement()
-  }, [params.id])
+  }, [params.id, role])
 
   if (loading) {
     return <div className="p-6">Chargement...</div>

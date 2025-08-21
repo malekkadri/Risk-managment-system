@@ -8,16 +8,20 @@ import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { AlertTriangle, Plus, Eye, Edit } from "lucide-react"
 import { RisqueDialog } from "@/components/risque-dialog"
+import { useRoleGuard } from "@/hooks/useRoleGuard"
 
 export default function RisquesPage() {
   const [risques, setRisques] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showDialog, setShowDialog] = useState(false)
   const [editingRisque, setEditingRisque] = useState<any>(null)
+  const role = useRoleGuard(["Admin", "DPO", "SuperAdmin", "Collaborateur"])
 
   useEffect(() => {
-    fetchRisques()
-  }, [])
+    if (role) {
+      fetchRisques()
+    }
+  }, [role])
 
   const fetchRisques = async () => {
     try {

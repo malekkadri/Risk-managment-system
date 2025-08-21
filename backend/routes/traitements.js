@@ -10,7 +10,11 @@ const XLSX = require("xlsx")
 const upload = multer({ storage: multer.memoryStorage() })
 
 // Obtenir tous les traitements avec filtres
-router.get("/", auth, async (req, res) => {
+router.get(
+  "/",
+  auth,
+  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur"),
+  async (req, res) => {
   try {
     const { pole, statut, base_legale, search } = req.query
 
@@ -50,10 +54,15 @@ router.get("/", auth, async (req, res) => {
     console.error(err.message)
     res.status(500).send("Erreur serveur")
   }
-})
+  },
+)
 
 // Obtenir un traitement par ID avec ses risques
-router.get("/:id", auth, async (req, res) => {
+router.get(
+  "/:id",
+  auth,
+  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur"),
+  async (req, res) => {
   try {
     const [traitement] = await db.query(
       `
@@ -85,10 +94,15 @@ router.get("/:id", auth, async (req, res) => {
     console.error(err.message)
     res.status(500).send("Erreur serveur")
   }
-})
+  },
+)
 
 // Créer un traitement
-router.post("/", auth, authorize("Admin", "DPO", "SuperAdmin", "Rapport"), async (req, res) => {
+router.post(
+  "/",
+  auth,
+  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur"),
+  async (req, res) => {
   const {
     nom,
     pole,
@@ -150,10 +164,15 @@ router.post("/", auth, authorize("Admin", "DPO", "SuperAdmin", "Rapport"), async
     console.error(err.message)
     res.status(500).send("Erreur serveur")
   }
-})
+  },
+)
 
 // Mettre à jour un traitement
-router.put("/:id", auth, authorize("Admin", "DPO", "SuperAdmin", "Rapport"), async (req, res) => {
+router.put(
+  "/:id",
+  auth,
+  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur"),
+  async (req, res) => {
   const {
     nom,
     pole,
@@ -206,10 +225,15 @@ router.put("/:id", auth, authorize("Admin", "DPO", "SuperAdmin", "Rapport"), asy
     console.error(err.message)
     res.status(500).send("Erreur serveur")
   }
-})
+  },
+)
 
 // Supprimer un traitement
-router.delete("/:id", auth, authorize("Admin", "DPO", "SuperAdmin", "Rapport"), async (req, res) => {
+router.delete(
+  "/:id",
+  auth,
+  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur"),
+  async (req, res) => {
   try {
     await db.query("DELETE FROM Traitement WHERE id = ?", [req.params.id])
 
@@ -227,13 +251,14 @@ router.delete("/:id", auth, authorize("Admin", "DPO", "SuperAdmin", "Rapport"), 
     console.error(err.message)
     res.status(500).send("Erreur serveur")
   }
-})
+  },
+)
 
 // Importer des traitements depuis un fichier Excel
 router.post(
   "/import",
   auth,
-  authorize("Admin", "DPO", "SuperAdmin", "Rapport"),
+  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur"),
   upload.single("file"),
   async (req, res) => {
     try {

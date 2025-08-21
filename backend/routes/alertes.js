@@ -2,9 +2,14 @@ const express = require("express")
 const router = express.Router()
 const db = require("../config/db")
 const auth = require("../middleware/auth")
+const authorize = require("../middleware/authorize")
 
 // Obtenir toutes les alertes
-router.get("/", auth, async (req, res) => {
+router.get(
+  "/",
+  auth,
+  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur"),
+  async (req, res) => {
   try {
     const [alertes] = await db.query(`
       SELECT a.*, t.nom as nom_traitement, u.nom as nom_utilisateur
@@ -18,10 +23,15 @@ router.get("/", auth, async (req, res) => {
     console.error(err.message)
     res.status(500).send("Erreur serveur")
   }
-})
+  },
+)
 
 // Marquer une alerte comme lue
-router.put("/:id/read", auth, async (req, res) => {
+router.put(
+  "/:id/read",
+  auth,
+  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur"),
+  async (req, res) => {
   try {
     await db.query("UPDATE Alerte SET lu = TRUE WHERE id = ?", [req.params.id])
     res.json({ msg: "Alerte marquée comme lue" })
@@ -29,6 +39,7 @@ router.put("/:id/read", auth, async (req, res) => {
     console.error(err.message)
     res.status(500).send("Erreur serveur")
   }
-})
+  },
+)
 
 module.exports = router

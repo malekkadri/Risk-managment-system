@@ -11,6 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Search, Edit, Trash2, UserPlus, Shield, UsersIcon } from "lucide-react"
 import { UserDialog } from "@/components/user-dialog"
+import { useRoleGuard } from "@/hooks/useRoleGuard"
 
 export default function UsersPage() {
   const [users, setUsers] = useState<any[]>([])
@@ -22,25 +23,13 @@ export default function UsersPage() {
 
   const router = useRouter()
 
+  const role = useRoleGuard(["Admin", "DPO", "SuperAdmin"])
+
   useEffect(() => {
-    const stored = localStorage.getItem("user")
-    if (stored) {
-      try {
-        const current = JSON.parse(stored)
-        if (current.role === "Rapport" || current.role === "Collaborateur") {
-          router.push("/dashboard")
-          return
-        }
-      } catch {
-        router.push("/login")
-        return
-      }
-    } else {
-      router.push("/login")
-      return
+    if (role) {
+      fetchUsers()
     }
-    fetchUsers()
-  }, [])
+  }, [role])
 
   useEffect(() => {
     filterUsers()

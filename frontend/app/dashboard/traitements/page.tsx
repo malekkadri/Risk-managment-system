@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { PlusCircle, Search, Eye, Edit, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { TraitementDialog } from "@/components/traitement-dialog"
+import { useRoleGuard } from "@/hooks/useRoleGuard"
 
 export default function TraitementsPage() {
   const [traitements, setTraitements] = useState<any[]>([])
@@ -21,10 +22,13 @@ export default function TraitementsPage() {
   const [poleFilter, setPoleFilter] = useState("all")
   const [showDialog, setShowDialog] = useState(false)
   const [editingTraitement, setEditingTraitement] = useState<any>(null)
+  const role = useRoleGuard(["Admin", "DPO", "SuperAdmin", "Collaborateur"])
 
   useEffect(() => {
-    fetchTraitements()
-  }, [])
+    if (role) {
+      fetchTraitements()
+    }
+  }, [role])
 
   useEffect(() => {
     filterTraitements()
