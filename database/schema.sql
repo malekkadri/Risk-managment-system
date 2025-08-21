@@ -8,7 +8,7 @@ USE smart_dpo;
 CREATE TABLE IF NOT EXISTS Utilisateur (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(255) NOT NULL,
-    role ENUM('DPO', 'Admin', 'Collaborateur') NOT NULL,
+    role ENUM('DPO', 'Admin', 'Collaborateur', 'SuperAdmin') NOT NULL,
     email VARCHAR(191) NOT NULL UNIQUE,  -- Réduit de 255 à 191 pour utf8mb4
     mot_de_passe VARCHAR(255) NOT NULL,
     actif BOOLEAN DEFAULT TRUE,
@@ -128,6 +128,7 @@ CREATE TABLE IF NOT EXISTS Rapport (
 -- Insertion de données d'exemple avec mots de passe hashés
 -- Mot de passe: "password123" hashé avec bcrypt
 INSERT INTO Utilisateur (nom, role, email, mot_de_passe) VALUES
+('Super Admin', 'SuperAdmin', 'super.admin@example.com', '$2a$10$DM29GNklacafTPWB.8BpIeDDJxMc8gri6uPvJkl3OEYAdCYDxFGDi'),
 ('Jean Dupont', 'DPO', 'jean.dupont@example.com', '$2b$10$rOzJqQjQjQjQjQjQjQjQjOzJqQjQjQjQjQjQjQjQjOzJqQjQjQjQjQ'),
 ('Marie Curie', 'Admin', 'marie.curie@example.com', '$2b$10$rOzJqQjQjQjQjQjQjQjQjOzJqQjQjQjQjQjQjQjQjOzJqQjQjQjQjQ'),
 ('Pierre Martin', 'Collaborateur', 'pierre.martin@example.com', '$2b$10$rOzJqQjQjQjQjQjQjQjQjOzJqQjQjQjQjQjQjQjQjOzJqQjQjQjQjQ');
