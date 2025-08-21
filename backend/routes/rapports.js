@@ -2,11 +2,12 @@ const express = require("express")
 const router = express.Router()
 const db = require("../config/db")
 const auth = require("../middleware/auth")
+const authorize = require("../middleware/authorize")
 const PDFDocument = require("pdfkit")
 const XLSX = require("xlsx")
 
 // Générer un rapport de conformité
-router.get("/conformite", auth, async (req, res) => {
+router.get("/conformite", auth, authorize("Admin", "DPO", "SuperAdmin"), async (req, res) => {
   try {
     const [traitements] = await db.query(`
       SELECT t.*, COUNT(r.id) as nombre_risques, AVG(r.score_risque) as score_moyen
@@ -42,7 +43,7 @@ router.get("/conformite", auth, async (req, res) => {
 })
 
 // Exporter en PDF
-router.get("/conformite/pdf", auth, async (req, res) => {
+router.get("/conformite/pdf", auth, authorize("Admin", "DPO", "SuperAdmin"), async (req, res) => {
   try {
     const [traitements] = await db.query(`
       SELECT t.*, COUNT(r.id) as nombre_risques
@@ -75,7 +76,7 @@ router.get("/conformite/pdf", auth, async (req, res) => {
 })
 
 // Exporter en Excel
-router.get("/conformite/excel", auth, async (req, res) => {
+router.get("/conformite/excel", auth, authorize("Admin", "DPO", "SuperAdmin"), async (req, res) => {
   try {
     const [traitements] = await db.query(`
       SELECT t.nom, t.pole, t.base_legale, t.statut_conformite, t.duree_conservation,
