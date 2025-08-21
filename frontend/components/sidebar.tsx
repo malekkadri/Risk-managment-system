@@ -4,6 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import Image from "next/image"
+import { useEffect, useState } from "react"
 import {
   ShieldCheck,
   FileText,
@@ -21,15 +22,29 @@ const navigation = [
   { name: "Traitements", href: "/dashboard/traitements", icon: FileText },
   { name: "Risques", href: "/dashboard/risques", icon: AlertTriangle },
   { name: "Mesures correctives", href: "/dashboard/mesures", icon: ShieldCheck },
-  { name: "Utilisateurs", href: "/dashboard/users", icon: Users },
+  { name: "Utilisateurs", href: "/dashboard/users", icon: Users, roles: ["Admin", "DPO", "SuperAdmin"] },
   { name: "Alertes", href: "/dashboard/alertes", icon: Bell },
   { name: "Journal", href: "/dashboard/journal", icon: BookOpen },
   { name: "Rapports", href: "/dashboard/rapports", icon: Download },
-  { name: "Paramètres", href: "/dashboard/settings", icon: Settings },
+  { name: "Paramètres", href: "/dashboard/settings", icon: Settings, roles: ["Admin", "DPO", "SuperAdmin"] },
 ]
 
 export function Sidebar() {
   const pathname = usePathname()
+  const [userRole, setUserRole] = useState<string | null>(null)
+
+  useEffect(() => {
+    const stored = localStorage.getItem("user")
+    if (stored) {
+      try {
+        setUserRole(JSON.parse(stored).role)
+      } catch {
+        setUserRole(null)
+      }
+    }
+  }, [])
+
+  const items = navigation.filter((item) => !item.roles || (userRole && item.roles.includes(userRole)))
 
   return (
     <div className="flex flex-col w-64 bg-white shadow-xl border-r border-gray-200">
@@ -49,7 +64,7 @@ export function Sidebar() {
       {/* Navigation */}
       <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
         <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">Gestion RGPD</div>
-        {navigation.map((item) => {
+        {items.map((item) => {
           const isActive = pathname === item.href
           return (
             <Link
