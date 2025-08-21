@@ -6,6 +6,7 @@ import "../styles/animations.css"
 import "../styles/components.css"
 import { cn } from "@/lib/utils"
 import ThemeLogger from "@/components/theme-logger"
+import ChatBot from "@/components/chatbot"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -112,6 +113,7 @@ export default function RootLayout({
         <ThemeLogger />
         <div id="root">{children}</div>
         <div id="portal-root" />
+        <ChatBot />
       </body>
     </html>
   )

@@ -49,6 +49,9 @@ const nextConfig = {
   swcMinify: true,
   poweredByHeader: false,
   reactStrictMode: true,
+  env: {
+    GROQ_API_KEY: process.env.GROQ_API_KEY,
+  },
 
   // Configuration des redirections
   async redirects() {
