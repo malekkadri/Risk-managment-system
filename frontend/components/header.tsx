@@ -95,7 +95,12 @@ export function Header() {
       {/* Right Section */}
       <div className="flex items-center space-x-4">
         {/* Help Button */}
-        <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-white hover:bg-white/10"
+          onClick={() => router.push("/aide")}
+        >
           <HelpCircle className="w-5 h-5" />
         </Button>
 
@@ -142,11 +147,11 @@ export function Header() {
               <Settings className="w-4 h-4 mr-2" />
               Paramètres
             </DropdownMenuItem>
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push("/profile")}>
               <User className="w-4 h-4 mr-2" />
               Mon profil
             </DropdownMenuItem>
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push("/aide")}>
               <HelpCircle className="w-4 h-4 mr-2" />
               Aide & Support
             </DropdownMenuItem>
