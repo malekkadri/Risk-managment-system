@@ -1,6 +1,8 @@
 "use client"
 
 import { useState } from "react"
+import { Bot, X } from "lucide-react"
+import { API_BASE_URL } from "@/lib/api"
 
 interface Message {
   role: "user" | "assistant"
@@ -12,11 +14,53 @@ export default function ChatBot() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState("")
 
+  const systemMessage = {
+    role: "system" as const,
+    content:
+      "Tu es l'assistant du projet SBA Compta RGPD. Réponds uniquement en français, aide les utilisateurs à comprendre le fonctionnement du site et fournis des informations sur les flux et statistiques quand c'est possible.",
+  }
+
   const sendMessage = async () => {
     if (!input.trim()) return
     const newMessages = [...messages, { role: "user", content: input }]
     setMessages(newMessages)
     setInput("")
+
+    const lower = input.trim().toLowerCase()
+    const token = localStorage.getItem("token")
+
+    if (lower === "/stats") {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/dashboard/stats`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        })
+        const data = await res.json()
+        setMessages([...newMessages, { role: "assistant", content: JSON.stringify(data) }])
+      } catch {
+        setMessages([
+          ...newMessages,
+          { role: "assistant", content: "Impossible de récupérer les statistiques." },
+        ])
+      }
+      return
+    }
+
+    if (lower === "/flow") {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/dashboard/evolution`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        })
+        const data = await res.json()
+        setMessages([...newMessages, { role: "assistant", content: JSON.stringify(data) }])
+      } catch {
+        setMessages([
+          ...newMessages,
+          { role: "assistant", content: "Impossible de récupérer le flux du site." },
+        ])
+      }
+      return
+    }
+
     try {
       const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
         method: "POST",
@@ -26,7 +70,7 @@ export default function ChatBot() {
         },
         body: JSON.stringify({
           model: "llama3-8b-8192",
-          messages: newMessages,
+          messages: [systemMessage, ...newMessages],
         }),
       })
       const data = await res.json()
@@ -78,8 +122,9 @@ export default function ChatBot() {
       <button
         onClick={() => setOpen(!open)}
         className="bg-purple-600 text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg"
+        aria-label="Chatbot"
       >
-        {open ? "×" : "?"}
+        {open ? <X className="w-6 h-6" /> : <Bot className="w-6 h-6" />}
       </button>
     </div>
   )
