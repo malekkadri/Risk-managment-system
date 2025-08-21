@@ -5,10 +5,11 @@ import { API_BASE_URL } from "@/lib/api"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Download, FileText, BarChart3, Activity } from "lucide-react"
+import { Download, FileText, BarChart3, Activity, Upload } from "lucide-react"
 
 export default function RapportsPage() {
   const [loading, setLoading] = useState<string | null>(null)
+  const [file, setFile] = useState<File | null>(null)
 
   const handleExport = async (type: string, format: string) => {
     setLoading(`${type}-${format}`)
@@ -31,6 +32,28 @@ export default function RapportsPage() {
       }
     } catch (error) {
       console.error("Erreur lors de l'export:", error)
+    } finally {
+      setLoading(null)
+    }
+  }
+
+  const handleImport = async () => {
+    if (!file) return
+    setLoading("import")
+    try {
+      const token = localStorage.getItem("token")
+      const formData = new FormData()
+      formData.append("file", file)
+      const response = await fetch(`${API_BASE_URL}/api/traitements/import`, {
+        method: "POST",
+        headers: { "x-auth-token": token || "" },
+        body: formData,
+      })
+      if (response.ok) {
+        setFile(null)
+      }
+    } catch (error) {
+      console.error("Erreur lors de l'import:", error)
     } finally {
       setLoading(null)
     }
@@ -105,6 +128,28 @@ export default function RapportsPage() {
           </Card>
         ))}
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Importer un fichier Excel</CardTitle>
+          <CardDescription>Ajoutez des traitements depuis un fichier .xlsx</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <input
+            type="file"
+            accept=".xlsx"
+            onChange={(e) => setFile(e.target.files?.[0] || null)}
+          />
+          <Button
+            onClick={handleImport}
+            disabled={!file || loading === "import"}
+            className="flex items-center"
+          >
+            <Upload className="mr-2 h-4 w-4" />
+            {loading === "import" ? "Import..." : "Importer"}
+          </Button>
+        </CardContent>
+      </Card>
 
       {/* Rapports personnalisés */}
       <Card>

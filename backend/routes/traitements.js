@@ -2,7 +2,12 @@ const express = require("express")
 const router = express.Router()
 const db = require("../config/db")
 const auth = require("../middleware/auth")
+const authorize = require("../middleware/authorize")
 const { evaluateRisk } = require("../services/riskAssessment")
+const multer = require("multer")
+const XLSX = require("xlsx")
+
+const upload = multer({ storage: multer.memoryStorage() })
 
 // Obtenir tous les traitements avec filtres
 router.get("/", auth, async (req, res) => {
@@ -83,7 +88,7 @@ router.get("/:id", auth, async (req, res) => {
 })
 
 // Créer un traitement
-router.post("/", auth, async (req, res) => {
+router.post("/", auth, authorize("Admin", "DPO", "SuperAdmin"), async (req, res) => {
   const {
     nom,
     pole,
@@ -148,7 +153,7 @@ router.post("/", auth, async (req, res) => {
 })
 
 // Mettre à jour un traitement
-router.put("/:id", auth, async (req, res) => {
+router.put("/:id", auth, authorize("Admin", "DPO", "SuperAdmin"), async (req, res) => {
   const {
     nom,
     pole,
@@ -204,7 +209,7 @@ router.put("/:id", auth, async (req, res) => {
 })
 
 // Supprimer un traitement
-router.delete("/:id", auth, async (req, res) => {
+router.delete("/:id", auth, authorize("Admin", "DPO", "SuperAdmin"), async (req, res) => {
   try {
     await db.query("DELETE FROM Traitement WHERE id = ?", [req.params.id])
 
@@ -223,5 +228,91 @@ router.delete("/:id", auth, async (req, res) => {
     res.status(500).send("Erreur serveur")
   }
 })
+
+// Importer des traitements depuis un fichier Excel
+router.post(
+  "/import",
+  auth,
+  authorize("Admin", "DPO", "SuperAdmin"),
+  upload.single("file"),
+  async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ msg: "Aucun fichier fourni" })
+      }
+
+      const workbook = XLSX.read(req.file.buffer, { type: "buffer" })
+      const sheet = workbook.Sheets[workbook.SheetNames[0]]
+      const rows = XLSX.utils.sheet_to_json(sheet, { defval: "" })
+
+      for (const row of rows) {
+        const nom = row["Nom du Traitement"]
+        if (!nom) continue
+
+        const pole = row["Nom de l'organisation"] || null
+        const finalite = row["Finalité (Description)"] || null
+
+        const baseLegaleText = (row["Base Légale"] || "").toLowerCase()
+        let base_legale = null
+        if (baseLegaleText.includes("obligation")) base_legale = "Obligation légale"
+        else if (baseLegaleText.includes("contrat")) base_legale = "Contrat"
+        else if (baseLegaleText.includes("légitime")) base_legale = "Intérêt légitime"
+        else if (baseLegaleText.includes("consent")) base_legale = "Consentement"
+        else if (baseLegaleText.includes("intérêt vital")) base_legale = "Intérêt vital"
+        else if (baseLegaleText.includes("mission")) base_legale = "Mission publique"
+
+        const type_dcp = row["Catégories de données personnelles collectées"] || null
+        const dureeText = row["Durée de conservation"] || ""
+        const dureeMatch = dureeText.match(/\d+/)
+        const duree_conservation = dureeMatch ? parseInt(dureeMatch[0], 10) : null
+        const transfert_hors_ue = /oui/i.test(
+          row["Transfert hors UE \r\n(O/N + PAYS + GARANTIES)"] || "",
+        )
+        const mesures_securite = row["Mesures de sécurité (Description)"] || null
+        const statut_conformite = /oui/i.test(
+          row["Conformité RGPD (O/N + Explication)"] || "",
+        )
+          ? "Conforme"
+          : "Non conforme"
+
+        await db.query(
+          `
+          INSERT INTO Traitement (
+            nom, pole, base_legale, finalite, duree_conservation, type_dcp,
+            nombre_personnes_concernees, transfert_hors_ue, mesures_securite, statut_conformite
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          ON DUPLICATE KEY UPDATE
+            pole=VALUES(pole),
+            base_legale=VALUES(base_legale),
+            finalite=VALUES(finalite),
+            duree_conservation=VALUES(duree_conservation),
+            type_dcp=VALUES(type_dcp),
+            nombre_personnes_concernees=VALUES(nombre_personnes_concernees),
+            transfert_hors_ue=VALUES(transfert_hors_ue),
+            mesures_securite=VALUES(mesures_securite),
+            statut_conformite=VALUES(statut_conformite)
+        `,
+          [
+            nom,
+            pole,
+            base_legale,
+            finalite,
+            duree_conservation,
+            type_dcp,
+            0,
+            transfert_hors_ue,
+            mesures_securite,
+            statut_conformite,
+          ],
+        )
+      }
+
+      res.json({ msg: "Import terminé", count: rows.length })
+    } catch (err) {
+      console.error(err.message)
+      res.status(500).send("Erreur serveur")
+    }
+  },
+)
 
 module.exports = router
