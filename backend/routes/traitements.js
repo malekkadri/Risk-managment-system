@@ -88,7 +88,7 @@ router.get("/:id", auth, async (req, res) => {
 })
 
 // Créer un traitement
-router.post("/", auth, authorize("Admin", "DPO", "SuperAdmin"), async (req, res) => {
+router.post("/", auth, authorize("Admin", "DPO", "SuperAdmin", "Rapport"), async (req, res) => {
   const {
     nom,
     pole,
@@ -153,7 +153,7 @@ router.post("/", auth, authorize("Admin", "DPO", "SuperAdmin"), async (req, res)
 })
 
 // Mettre à jour un traitement
-router.put("/:id", auth, authorize("Admin", "DPO", "SuperAdmin"), async (req, res) => {
+router.put("/:id", auth, authorize("Admin", "DPO", "SuperAdmin", "Rapport"), async (req, res) => {
   const {
     nom,
     pole,
@@ -209,7 +209,7 @@ router.put("/:id", auth, authorize("Admin", "DPO", "SuperAdmin"), async (req, re
 })
 
 // Supprimer un traitement
-router.delete("/:id", auth, authorize("Admin", "DPO", "SuperAdmin"), async (req, res) => {
+router.delete("/:id", auth, authorize("Admin", "DPO", "SuperAdmin", "Rapport"), async (req, res) => {
   try {
     await db.query("DELETE FROM Traitement WHERE id = ?", [req.params.id])
 
@@ -233,7 +233,7 @@ router.delete("/:id", auth, authorize("Admin", "DPO", "SuperAdmin"), async (req,
 router.post(
   "/import",
   auth,
-  authorize("Admin", "DPO", "SuperAdmin"),
+  authorize("Admin", "DPO", "SuperAdmin", "Rapport"),
   upload.single("file"),
   async (req, res) => {
     try {
