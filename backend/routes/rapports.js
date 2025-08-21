@@ -42,63 +42,122 @@ router.get("/conformite", auth, authorize("Admin", "DPO", "SuperAdmin"), async (
   }
 })
 
-// Exporter en PDF
-router.get("/conformite/pdf", auth, authorize("Admin", "DPO", "SuperAdmin"), async (req, res) => {
-  try {
-    const [traitements] = await db.query(`
-      SELECT t.*, COUNT(r.id) as nombre_risques
-      FROM Traitement t
-      LEFT JOIN Risque r ON t.id = r.traitement_id
-      GROUP BY t.id
-      ORDER BY t.statut_conformite, t.nom
-    `)
+// Exporter les différents rapports
+router.get(
+  "/:type/:format",
+  auth,
+  authorize("Admin", "DPO", "SuperAdmin"),
+  async (req, res) => {
+    const { type, format } = req.params
 
-    const doc = new PDFDocument()
-    res.setHeader("Content-Type", "application/pdf")
-    res.setHeader("Content-Disposition", "attachment; filename=rapport-conformite.pdf")
+    try {
+      let data
+      let title
 
-    doc.pipe(res)
+      switch (type) {
+        case "conformite": {
+          const [traitements] = await db.query(`
+            SELECT t.nom, t.pole, t.base_legale, t.statut_conformite, t.duree_conservation,
+                   COUNT(r.id) as nombre_risques, AVG(r.score_risque) as score_moyen
+            FROM Traitement t
+            LEFT JOIN Risque r ON t.id = r.traitement_id
+            GROUP BY t.id
+            ORDER BY t.statut_conformite, t.nom
+          `)
+          data = traitements
+          title = "Rapport de Conformité RGPD"
+          break
+        }
+        case "risques": {
+          const [risques] = await db.query(`
+            SELECT r.*, t.nom as nom_traitement, t.pole
+            FROM Risque r
+            JOIN Traitement t ON r.traitement_id = t.id
+            ORDER BY r.score_risque DESC
+          `)
+          data = risques
+          title = "Analyse des Risques"
+          break
+        }
+        case "activite": {
+          const [actions] = await db.query(`
+            SELECT ja.*, u.nom as nom_utilisateur, t.nom as nom_traitement
+            FROM JournalAction ja
+            LEFT JOIN Utilisateur u ON ja.utilisateur_id = u.id
+            LEFT JOIN Traitement t ON ja.traitement_id = t.id
+            ORDER BY ja.date_action DESC
+            LIMIT 100
+          `)
+          data = actions
+          title = "Rapport d'Activité"
+          break
+        }
+        default:
+          return res.status(400).send("Type de rapport invalide")
+      }
 
-    doc.fontSize(20).text("Rapport de Conformité RGPD", 100, 100)
-    doc.fontSize(12).text(`Généré le ${new Date().toLocaleDateString("fr-FR")}`, 100, 130)
+      if (format === "pdf") {
+        const doc = new PDFDocument()
+        res.setHeader("Content-Type", "application/pdf")
+        res.setHeader(
+          "Content-Disposition",
+          `attachment; filename=rapport-${type}.pdf`,
+        )
 
-    let y = 160
-    traitements.forEach((traitement) => {
-      doc.text(`${traitement.nom} - ${traitement.statut_conformite}`, 100, y)
-      y += 20
-    })
+        doc.pipe(res)
 
-    doc.end()
-  } catch (err) {
-    console.error(err.message)
-    res.status(500).send("Erreur serveur")
-  }
-})
+        doc.fontSize(20).text(title, 100, 100)
+        doc.fontSize(12).text(`Généré le ${new Date().toLocaleDateString("fr-FR")}`, 100, 130)
 
-// Exporter en Excel
-router.get("/conformite/excel", auth, authorize("Admin", "DPO", "SuperAdmin"), async (req, res) => {
-  try {
-    const [traitements] = await db.query(`
-      SELECT t.nom, t.pole, t.base_legale, t.statut_conformite, t.duree_conservation,
-             COUNT(r.id) as nombre_risques, AVG(r.score_risque) as score_moyen
-      FROM Traitement t
-      LEFT JOIN Risque r ON t.id = r.traitement_id
-      GROUP BY t.id
-    `)
+        let y = 160
+        if (type === "conformite") {
+          data.forEach((item) => {
+            doc.text(`${item.nom} - ${item.statut_conformite}`, 100, y)
+            y += 20
+          })
+        } else if (type === "risques") {
+          data.forEach((item) => {
+            doc.text(
+              `${item.nom_traitement} - ${item.type_risque} (${item.score_risque})`,
+              100,
+              y,
+            )
+            y += 20
+          })
+        } else if (type === "activite") {
+          data.forEach((item) => {
+            doc.text(
+              `${new Date(item.date_action).toLocaleDateString("fr-FR")} - ${item.nom_utilisateur} : ${item.action}`,
+              100,
+              y,
+            )
+            y += 20
+          })
+        }
 
-    const ws = XLSX.utils.json_to_sheet(traitements)
-    const wb = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(wb, ws, "Conformité RGPD")
-
-    const buffer = XLSX.write(wb, { type: "buffer", bookType: "xlsx" })
-
-    res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-    res.setHeader("Content-Disposition", "attachment; filename=rapport-conformite.xlsx")
-    res.send(buffer)
-  } catch (err) {
-    console.error(err.message)
-    res.status(500).send("Erreur serveur")
-  }
-})
+        doc.end()
+      } else if (format === "excel") {
+        const ws = XLSX.utils.json_to_sheet(data)
+        const wb = XLSX.utils.book_new()
+        XLSX.utils.book_append_sheet(wb, ws, title)
+        const buffer = XLSX.write(wb, { type: "buffer", bookType: "xlsx" })
+        res.setHeader(
+          "Content-Type",
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+        res.setHeader(
+          "Content-Disposition",
+          `attachment; filename=rapport-${type}.xlsx`,
+        )
+        res.send(buffer)
+      } else {
+        res.status(400).send("Format non supporté")
+      }
+    } catch (err) {
+      console.error(err.message)
+      res.status(500).send("Erreur serveur")
+    }
+  },
+)
 
 module.exports = router
