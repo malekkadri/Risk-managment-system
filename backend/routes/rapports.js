@@ -7,40 +7,45 @@ const PDFDocument = require("pdfkit")
 const XLSX = require("xlsx")
 
 // Générer un rapport de conformité
-router.get("/conformite", auth, authorize("Admin", "DPO", "SuperAdmin", "Rapport"), async (req, res) => {
-  try {
-    const [traitements] = await db.query(`
-      SELECT t.*, COUNT(r.id) as nombre_risques, AVG(r.score_risque) as score_moyen
-      FROM Traitement t
-      LEFT JOIN Risque r ON t.id = r.traitement_id
-      GROUP BY t.id
-      ORDER BY t.statut_conformite, t.nom
-    `)
+router.get(
+  "/conformite",
+  auth,
+  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur", "Rapport"),
+  async (req, res) => {
+    try {
+      const [traitements] = await db.query(`
+        SELECT t.*, COUNT(r.id) as nombre_risques, AVG(r.score_risque) as score_moyen
+        FROM Traitement t
+        LEFT JOIN Risque r ON t.id = r.traitement_id
+        GROUP BY t.id
+        ORDER BY t.statut_conformite, t.nom
+      `)
 
-    const rapport = {
-      date_generation: new Date(),
-      total_traitements: traitements.length,
-      conformes: traitements.filter((t) => t.statut_conformite === "Conforme").length,
-      non_conformes: traitements.filter((t) => t.statut_conformite === "Non conforme").length,
-      a_verifier: traitements.filter((t) => t.statut_conformite === "À vérifier").length,
-      traitements,
+      const rapport = {
+        date_generation: new Date(),
+        total_traitements: traitements.length,
+        conformes: traitements.filter((t) => t.statut_conformite === "Conforme").length,
+        non_conformes: traitements.filter((t) => t.statut_conformite === "Non conforme").length,
+        a_verifier: traitements.filter((t) => t.statut_conformite === "À vérifier").length,
+        traitements,
+      }
+
+      // Sauvegarder le rapport
+      await db.query(
+        `
+        INSERT INTO Rapport (titre, type_rapport, contenu, genere_par)
+        VALUES (?, 'Conformité', ?, ?)
+      `,
+        ["Rapport de Conformité RGPD", JSON.stringify(rapport), req.user.id],
+      )
+
+      res.json(rapport)
+    } catch (err) {
+      console.error(err.message)
+      res.status(500).send("Erreur serveur")
     }
-
-    // Sauvegarder le rapport
-    await db.query(
-      `
-      INSERT INTO Rapport (titre, type_rapport, contenu, genere_par)
-      VALUES (?, 'Conformité', ?, ?)
-    `,
-      ["Rapport de Conformité RGPD", JSON.stringify(rapport), req.user.id],
-    )
-
-    res.json(rapport)
-  } catch (err) {
-    console.error(err.message)
-    res.status(500).send("Erreur serveur")
-  }
-})
+  },
+)
 
 // Helper to build data for a specific report type
 async function buildReport(type) {
@@ -148,7 +153,7 @@ function exportReport(type, format, data, title, res) {
 router.get(
   "/conformite/:format",
   auth,
-  authorize("Admin", "DPO", "SuperAdmin", "Rapport"),
+  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur", "Rapport"),
   async (req, res) => {
     try {
       const { data, title } = await buildReport("conformite")
@@ -163,7 +168,7 @@ router.get(
 router.get(
   "/risques/:format",
   auth,
-  authorize("Admin", "DPO", "SuperAdmin", "Rapport"),
+  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur", "Rapport"),
   async (req, res) => {
     try {
       const { data, title } = await buildReport("risques")
@@ -178,7 +183,7 @@ router.get(
 router.get(
   "/activite/:format",
   auth,
-  authorize("Admin", "DPO", "SuperAdmin", "Rapport"),
+  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur", "Rapport"),
   async (req, res) => {
     try {
       const { data, title } = await buildReport("activite")
