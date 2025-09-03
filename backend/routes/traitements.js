@@ -13,7 +13,7 @@ const upload = multer({ storage: multer.memoryStorage() })
 router.get(
   "/",
   auth,
-  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur"),
+  authorize("admin", "dpo", "super admin", "responsable du traitement"),
   async (req, res) => {
   try {
     const { pole, statut, base_legale, search } = req.query
@@ -61,7 +61,7 @@ router.get(
 router.get(
   "/:id",
   auth,
-  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur"),
+  authorize("admin", "dpo", "super admin", "responsable du traitement"),
   async (req, res) => {
   try {
     const [traitement] = await db.query(
@@ -101,7 +101,7 @@ router.get(
 router.post(
   "/",
   auth,
-  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur"),
+  authorize("admin", "dpo", "super admin", "responsable du traitement"),
   async (req, res) => {
   const {
     nom,
@@ -171,7 +171,7 @@ router.post(
 router.put(
   "/:id",
   auth,
-  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur"),
+  authorize("admin", "dpo", "super admin", "responsable du traitement"),
   async (req, res) => {
   const {
     nom,
@@ -232,7 +232,7 @@ router.put(
 router.delete(
   "/:id",
   auth,
-  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur"),
+  authorize("admin", "dpo", "super admin", "responsable du traitement"),
   async (req, res) => {
   try {
     await db.query("DELETE FROM Traitement WHERE id = ?", [req.params.id])
@@ -258,7 +258,7 @@ router.delete(
 router.post(
   "/import",
   auth,
-  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur", "Rapport"),
+  authorize("admin", "dpo", "super admin", "responsable du traitement", "sous traitant"),
   upload.single("file"),
   async (req, res) => {
     try {

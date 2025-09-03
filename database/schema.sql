@@ -8,7 +8,7 @@ USE smart_dpo;
 CREATE TABLE IF NOT EXISTS Utilisateur (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(255) NOT NULL,
-    role ENUM('DPO', 'Admin', 'Collaborateur', 'SuperAdmin', 'Rapport') NOT NULL,
+    role ENUM('dpo', 'admin', 'responsable du traitement', 'super admin', 'sous traitant') NOT NULL,
     email VARCHAR(191) NOT NULL UNIQUE,  -- Réduit de 255 à 191 pour utf8mb4
     mot_de_passe VARCHAR(255) NOT NULL,
     actif BOOLEAN DEFAULT TRUE,
@@ -128,11 +128,11 @@ CREATE TABLE IF NOT EXISTS Rapport (
 -- Insertion de données d'exemple avec mots de passe hashés
 -- Mot de passe: "password123" hashé avec bcrypt
 INSERT INTO Utilisateur (nom, role, email, mot_de_passe) VALUES
-('Super Admin', 'SuperAdmin', 'super.admin@example.com', '$2a$10$DM29GNklacafTPWB.8BpIeDDJxMc8gri6uPvJkl3OEYAdCYDxFGDi'),
-('Jean Dupont', 'DPO', 'jean.dupont@example.com', '$2b$10$rOzJqQjQjQjQjQjQjQjQjOzJqQjQjQjQjQjQjQjQjOzJqQjQjQjQjQ'),
-('Marie Curie', 'Admin', 'marie.curie@example.com', '$2b$10$rOzJqQjQjQjQjQjQjQjQjOzJqQjQjQjQjQjQjQjQjOzJqQjQjQjQjQ'),
-('Pierre Martin', 'Collaborateur', 'pierre.martin@example.com', '$2b$10$rOzJqQjQjQjQjQjQjQjQjOzJqQjQjQjQjQjQjQjQjOzJqQjQjQjQjQ'),
-('Rapporteur', 'Rapport', 'rapport.user@example.com', '$2a$10$DM29GNklacafTPWB.8BpIeDDJxMc8gri6uPvJkl3OEYAdCYDxFGDi');
+('Super Admin', 'super admin', 'super.admin@example.com', '$2a$10$DM29GNklacafTPWB.8BpIeDDJxMc8gri6uPvJkl3OEYAdCYDxFGDi'),
+('Jean Dupont', 'dpo', 'jean.dupont@example.com', '$2b$10$rOzJqQjQjQjQjQjQjQjQjOzJqQjQjQjQjQjQjQjQjOzJqQjQjQjQjQ'),
+('Marie Curie', 'admin', 'marie.curie@example.com', '$2b$10$rOzJqQjQjQjQjQjQjQjQjOzJqQjQjQjQjQjQjQjQjOzJqQjQjQjQjQ'),
+('Pierre Martin', 'responsable du traitement', 'pierre.martin@example.com', '$2b$10$rOzJqQjQjQjQjQjQjQjQjOzJqQjQjQjQjQjQjQjQjOzJqQjQjQjQjQ'),
+('Rapporteur', 'sous traitant', 'rapport.user@example.com', '$2a$10$DM29GNklacafTPWB.8BpIeDDJxMc8gri6uPvJkl3OEYAdCYDxFGDi');
 
 INSERT INTO Traitement (nom, pole, base_legale, finalite, duree_conservation, type_dcp, nombre_personnes_concernees, utilisateur_id, statut_conformite) VALUES
 ('Gestion de la paie', 'RH', 'Obligation légale', 'Établir les bulletins de paie des employés', 5, 'Nom, prénom, adresse, numéro de sécurité sociale, salaire', 150, 1, 'Conforme'),

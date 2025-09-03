@@ -54,7 +54,7 @@ export default function SettingsPage() {
 
   const [loading, setLoading] = useState(false)
   const [saved, setSaved] = useState(false)
-  useRoleGuard(["Admin", "DPO", "SuperAdmin"])
+  useRoleGuard(["admin", "dpo", "super admin"])
 
   const handleSave = async () => {
     setLoading(true)

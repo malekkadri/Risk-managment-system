@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     "SBA Compta",
     "automatisation",
     "sécurité",
-    "DPO",
+    "dpo",
     "protection des données",
   ],
   authors: [{ name: "SBA Compta" }],

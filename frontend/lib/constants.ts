@@ -140,9 +140,11 @@ export const RISK_LEVELS = {
 } as const
 
 export const USER_ROLES = {
-  DPO: "DPO",
-  ADMIN: "Admin",
-  COLLABORATEUR: "Collaborateur",
+  DPO: "dpo",
+  ADMIN: "admin",
+  SUPER_ADMIN: "super admin",
+  RESPONSABLE_DU_TRAITEMENT: "responsable du traitement",
+  SOUS_TRAITANT: "sous traitant",
 } as const
 
 export const ALERT_TYPES = {

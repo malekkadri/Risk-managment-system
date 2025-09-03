@@ -10,7 +10,7 @@ const XLSX = require("xlsx")
 router.get(
   "/conformite",
   auth,
-  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur", "Rapport"),
+  authorize("admin", "dpo", "super admin", "responsable du traitement", "sous traitant"),
   async (req, res) => {
     try {
       const [traitements] = await db.query(`
@@ -219,7 +219,7 @@ function exportReport(type, format, data, title, res) {
 router.get(
   "/conformite/:format",
   auth,
-  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur", "Rapport"),
+  authorize("admin", "dpo", "super admin", "responsable du traitement", "sous traitant"),
   async (req, res) => {
     try {
       const { data, title } = await buildReport("conformite")
@@ -234,7 +234,7 @@ router.get(
 router.get(
   "/risques/:format",
   auth,
-  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur", "Rapport"),
+  authorize("admin", "dpo", "super admin", "responsable du traitement", "sous traitant"),
   async (req, res) => {
     try {
       const { data, title } = await buildReport("risques")
@@ -249,7 +249,7 @@ router.get(
 router.get(
   "/activite/:format",
   auth,
-  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur", "Rapport"),
+  authorize("admin", "dpo", "super admin", "responsable du traitement", "sous traitant"),
   async (req, res) => {
     try {
       const { data, title } = await buildReport("activite")
@@ -264,7 +264,7 @@ router.get(
 router.get(
   "/mesures/:format",
   auth,
-  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur", "Rapport"),
+  authorize("admin", "dpo", "super admin", "responsable du traitement", "sous traitant"),
   async (req, res) => {
     try {
       const { data, title } = await buildReport("mesures")
@@ -279,7 +279,7 @@ router.get(
 router.get(
   "/custom/pole/:format",
   auth,
-  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur", "Rapport"),
+  authorize("admin", "dpo", "super admin", "responsable du traitement", "sous traitant"),
   async (req, res) => {
     try {
       const { data, title } = await buildReport("pole")
@@ -294,7 +294,7 @@ router.get(
 router.get(
   "/custom/suivi/:format",
   auth,
-  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur", "Rapport"),
+  authorize("admin", "dpo", "super admin", "responsable du traitement", "sous traitant"),
   async (req, res) => {
     try {
       const { data, title } = await buildReport("suivi")

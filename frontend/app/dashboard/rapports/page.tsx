@@ -71,7 +71,7 @@ const REPORTS: ReportDef[] = [
 ]
 
 export default function RapportsPage() {
-  useRoleGuard(["Admin", "DPO", "SuperAdmin", "Collaborateur", "Rapport"])
+  useRoleGuard(["admin", "dpo", "super admin", "responsable du traitement", "sous traitant"])
   const { toast } = useToast()
 
   // Per-report status & last run time
