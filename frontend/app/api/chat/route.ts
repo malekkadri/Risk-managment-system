@@ -3,7 +3,17 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
   try {
     const { model, messages } = await req.json();
-    console.log("/api/chat request", { model, messages });
+
+    // Strip unsupported properties such as `ts` before forwarding to Groq
+    const cleanMessages = Array.isArray(messages)
+      ? messages.map(({ role, content, name }: any) => ({
+          role,
+          content,
+          ...(name ? { name } : {}),
+        }))
+      : [];
+
+    console.log("/api/chat request", { model, messages: cleanMessages });
 
     const apiKey = process.env.GROQ_API_KEY;
     if (!apiKey) {
@@ -17,7 +27,7 @@ export async function POST(req: Request) {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
       },
-      body: JSON.stringify({ model, messages }),
+      body: JSON.stringify({ model, messages: cleanMessages }),
     });
 
     const data = await res.json();
