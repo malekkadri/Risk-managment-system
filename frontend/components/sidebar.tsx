@@ -72,7 +72,9 @@ export function Sidebar() {
     const stored = localStorage.getItem("user")
     if (stored) {
       try {
-        setUserRole(JSON.parse(stored).role)
+        const parsed = JSON.parse(stored)
+        const role = typeof parsed.role === "string" ? parsed.role.toLowerCase().trim() : null
+        setUserRole(role)
       } catch {
         setUserRole(null)
       }
