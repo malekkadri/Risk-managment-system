@@ -29,7 +29,7 @@ export function UserDialog({ open, onOpenChange, user, onSuccess }: UserDialogPr
   const [formData, setFormData] = useState({
     nom: "",
     email: "",
-    role: "Collaborateur",
+    role: "responsable du traitement",
     actif: true,
     mot_de_passe: "",
   })
@@ -40,7 +40,7 @@ export function UserDialog({ open, onOpenChange, user, onSuccess }: UserDialogPr
       setFormData({
         nom: user.nom || "",
         email: user.email || "",
-        role: user.role || "Collaborateur",
+        role: user.role || "responsable du traitement",
         actif: user.actif !== undefined ? user.actif : true,
         mot_de_passe: "",
       })
@@ -48,7 +48,7 @@ export function UserDialog({ open, onOpenChange, user, onSuccess }: UserDialogPr
       setFormData({
         nom: "",
         email: "",
-        role: "Collaborateur",
+        role: "responsable du traitement",
         actif: true,
         mot_de_passe: "",
       })
@@ -128,9 +128,11 @@ export function UserDialog({ open, onOpenChange, user, onSuccess }: UserDialogPr
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="DPO">DPO</SelectItem>
-                <SelectItem value="Admin">Administrateur</SelectItem>
-                <SelectItem value="Collaborateur">Collaborateur</SelectItem>
+                <SelectItem value="dpo">DPO</SelectItem>
+                <SelectItem value="super admin">Super admin</SelectItem>
+                <SelectItem value="admin">Admin</SelectItem>
+                <SelectItem value="responsable du traitement">Responsable du traitement</SelectItem>
+                <SelectItem value="sous traitant">Sous traitant</SelectItem>
               </SelectContent>
             </Select>
           </div>

@@ -11,7 +11,7 @@ import { useRoleGuard } from "@/hooks/useRoleGuard"
 export default function AlertesPage() {
   const [alertes, setAlertes] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-  const role = useRoleGuard(["Admin", "DPO", "SuperAdmin", "Collaborateur"])
+  const role = useRoleGuard(["admin", "dpo", "super admin", "responsable du traitement"])
 
   useEffect(() => {
     if (role) {

@@ -3,10 +3,10 @@ USE smart_dpo;
 
 -- Insert additional users
 INSERT INTO Utilisateur (nom, role, email, mot_de_passe) VALUES
-('Laura Bernard', 'DPO', 'laura.bernard@example.com', '$2a$10$DM29GNklacafTPWB.8BpIeDDJxMc8gri6uPvJkl3OEYAdCYDxFGDi'),
-('Thomas Petit', 'Collaborateur', 'thomas.petit@example.com', '$2a$10$DM29GNklacafTPWB.8BpIeDDJxMc8gri6uPvJkl3OEYAdCYDxFGDi'),
-('Sophie Martin', 'Collaborateur', 'sophie.martin@example.com', '$2a$10$DM29GNklacafTPWB.8BpIeDDJxMc8gri6uPvJkl3OEYAdCYDxFGDi'),
-('Lucas Dumont', 'DPO', 'lucas.dumont@example.com', '$2a$10$DM29GNklacafTPWB.8BpIeDDJxMc8gri6uPvJkl3OEYAdCYDxFGDi');
+('Laura Bernard', 'dpo', 'laura.bernard@example.com', '$2a$10$DM29GNklacafTPWB.8BpIeDDJxMc8gri6uPvJkl3OEYAdCYDxFGDi'),
+('Thomas Petit', 'responsable du traitement', 'thomas.petit@example.com', '$2a$10$DM29GNklacafTPWB.8BpIeDDJxMc8gri6uPvJkl3OEYAdCYDxFGDi'),
+('Sophie Martin', 'responsable du traitement', 'sophie.martin@example.com', '$2a$10$DM29GNklacafTPWB.8BpIeDDJxMc8gri6uPvJkl3OEYAdCYDxFGDi'),
+('Lucas Dumont', 'dpo', 'lucas.dumont@example.com', '$2a$10$DM29GNklacafTPWB.8BpIeDDJxMc8gri6uPvJkl3OEYAdCYDxFGDi');
 
 SET @id_laura = (SELECT id FROM Utilisateur WHERE email = 'laura.bernard@example.com');
 SET @id_thomas = (SELECT id FROM Utilisateur WHERE email = 'thomas.petit@example.com');

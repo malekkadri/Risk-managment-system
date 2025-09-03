@@ -130,7 +130,7 @@ export function Header() {
               </Avatar>
               <div className="text-left hidden md:block">
                 <div className="text-sm font-medium text-white">{user?.nom || "Utilisateur"}</div>
-                <div className="text-xs text-red-100">{user?.role || "Collaborateur"}</div>
+                <div className="text-xs text-red-100">{user?.role || "responsable du traitement"}</div>
               </div>
               <ChevronDown className="w-4 h-4 text-red-200" />
             </Button>

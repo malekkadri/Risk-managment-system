@@ -15,7 +15,7 @@ export default function RisquesPage() {
   const [loading, setLoading] = useState(true)
   const [showDialog, setShowDialog] = useState(false)
   const [editingRisque, setEditingRisque] = useState<any>(null)
-  const role = useRoleGuard(["Admin", "DPO", "SuperAdmin", "Collaborateur"])
+  const role = useRoleGuard(["admin", "dpo", "super admin", "responsable du traitement"])
 
   useEffect(() => {
     if (role) {

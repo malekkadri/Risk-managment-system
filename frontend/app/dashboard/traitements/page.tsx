@@ -22,7 +22,7 @@ export default function TraitementsPage() {
   const [poleFilter, setPoleFilter] = useState("all")
   const [showDialog, setShowDialog] = useState(false)
   const [editingTraitement, setEditingTraitement] = useState<any>(null)
-  const role = useRoleGuard(["Admin", "DPO", "SuperAdmin", "Collaborateur"])
+  const role = useRoleGuard(["admin", "dpo", "super admin", "responsable du traitement"])
 
   useEffect(() => {
     if (role) {
