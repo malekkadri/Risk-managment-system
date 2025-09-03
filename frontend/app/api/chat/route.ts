@@ -3,8 +3,11 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
   try {
     const { model, messages } = await req.json();
+    console.log("/api/chat request", { model, messages });
+
     const apiKey = process.env.GROQ_API_KEY;
     if (!apiKey) {
+      console.error("GROQ_API_KEY is missing");
       return NextResponse.json({ error: "Missing GROQ_API_KEY" }, { status: 500 });
     }
 
@@ -18,8 +21,13 @@ export async function POST(req: Request) {
     });
 
     const data = await res.json();
+    console.log("Groq response", { status: res.status, data });
     return NextResponse.json(data, { status: res.status });
   } catch (error) {
-    return NextResponse.json({ error: "Failed to fetch chat response" }, { status: 500 });
+    console.error("Error in /api/chat", error);
+    return NextResponse.json(
+      { error: "Failed to fetch chat response" },
+      { status: 500 }
+    );
   }
 }
