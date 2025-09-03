@@ -94,6 +94,30 @@ async function buildReport(type) {
       `)
       return { data: mesures, title: "Plan des Mesures Correctives" }
     }
+    case "pole": {
+      const [poles] = await db.query(`
+        SELECT pole,
+               COUNT(*) as nombre_traitements,
+               SUM(statut_conformite = 'Conforme') as conformes,
+               SUM(statut_conformite = 'Non conforme') as non_conformes
+        FROM Traitement
+        GROUP BY pole
+        ORDER BY pole
+      `)
+      return { data: poles, title: "Rapport par Pôle" }
+    }
+    case "suivi": {
+      const [suivi] = await db.query(`
+        SELECT mc.*, r.type_risque, r.score_risque, t.nom as nom_traitement,
+               u.nom as responsable
+        FROM MesureCorrective mc
+        LEFT JOIN Risque r ON mc.risque_id = r.id
+        LEFT JOIN Traitement t ON r.traitement_id = t.id
+        LEFT JOIN Utilisateur u ON mc.responsable_id = u.id
+        ORDER BY mc.date_echeance, mc.priorite DESC
+      `)
+      return { data: suivi, title: "Suivi des Mesures" }
+    }
     default:
       throw new Error("Type de rapport invalide")
   }
@@ -148,13 +172,22 @@ function exportReport(type, format, data, title, res) {
         )
         y += 20
       })
-    } else if (type === "mesures") {
+    } else if (type === "mesures" || type === "suivi") {
       data.forEach((item) => {
         const date = item.date_echeance
           ? new Date(item.date_echeance).toLocaleDateString("fr-FR")
           : "N/A"
         doc.text(
           `${item.nom_traitement} - ${item.description} (${item.priorite}, ${item.statut}) - ${date}`,
+          100,
+          y,
+        )
+        y += 20
+      })
+    } else if (type === "pole") {
+      data.forEach((item) => {
+        doc.text(
+          `${item.pole || "N/A"} - ${item.nombre_traitements} traitements (Conformes: ${item.conformes || 0}, Non conformes: ${item.non_conformes || 0})`,
           100,
           y,
         )
@@ -236,6 +269,36 @@ router.get(
     try {
       const { data, title } = await buildReport("mesures")
       exportReport("mesures", req.params.format, data, title, res)
+    } catch (err) {
+      console.error(err.message)
+      res.status(500).send("Erreur serveur")
+    }
+  },
+)
+
+router.get(
+  "/custom/pole/:format",
+  auth,
+  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur", "Rapport"),
+  async (req, res) => {
+    try {
+      const { data, title } = await buildReport("pole")
+      exportReport("pole", req.params.format, data, title, res)
+    } catch (err) {
+      console.error(err.message)
+      res.status(500).send("Erreur serveur")
+    }
+  },
+)
+
+router.get(
+  "/custom/suivi/:format",
+  auth,
+  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur", "Rapport"),
+  async (req, res) => {
+    try {
+      const { data, title } = await buildReport("suivi")
+      exportReport("suivi", req.params.format, data, title, res)
     } catch (err) {
       console.error(err.message)
       res.status(500).send("Erreur serveur")
