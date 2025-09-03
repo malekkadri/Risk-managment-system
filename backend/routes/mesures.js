@@ -90,4 +90,34 @@ router.put(
   },
 )
 
+// Supprimer une mesure corrective
+router.delete(
+  "/:id",
+  auth,
+  authorize("admin", "dpo", "super admin", "responsable du traitement"),
+  async (req, res) => {
+    try {
+      const [mesure] = await db.query("SELECT risque_id FROM MesureCorrective WHERE id = ?", [req.params.id])
+      await db.query("DELETE FROM MesureCorrective WHERE id = ?", [req.params.id])
+
+      if (mesure.length) {
+        const [risque] = await db.query("SELECT traitement_id FROM Risque WHERE id = ?", [mesure[0].risque_id])
+        const traitementId = risque.length ? risque[0].traitement_id : null
+        await db.query(
+          `
+          INSERT INTO JournalAction (utilisateur_id, traitement_id, risque_id, action, details)
+          VALUES (?, ?, ?, 'Suppression mesure', 'Mesure corrective supprimée')
+        `,
+          [req.user.id, traitementId, mesure[0].risque_id],
+        )
+      }
+
+      res.json({ msg: "Mesure supprimée" })
+    } catch (err) {
+      console.error(err.message)
+      res.status(500).send("Erreur serveur")
+    }
+  },
+)
+
 module.exports = router

@@ -97,4 +97,32 @@ router.put(
   },
 )
 
+// Supprimer un risque
+router.delete(
+  "/:id",
+  auth,
+  authorize("admin", "dpo", "super admin", "responsable du traitement"),
+  async (req, res) => {
+    try {
+      const [risque] = await db.query("SELECT traitement_id FROM Risque WHERE id = ?", [req.params.id])
+      await db.query("DELETE FROM Risque WHERE id = ?", [req.params.id])
+
+      if (risque.length) {
+        await db.query(
+          `
+          INSERT INTO JournalAction (utilisateur_id, traitement_id, risque_id, action, details)
+          VALUES (?, ?, ?, 'Suppression risque', 'Risque supprimé')
+        `,
+          [req.user.id, risque[0].traitement_id, req.params.id],
+        )
+      }
+
+      res.json({ msg: "Risque supprimé" })
+    } catch (err) {
+      console.error(err.message)
+      res.status(500).send("Erreur serveur")
+    }
+  },
+)
+
 module.exports = router
