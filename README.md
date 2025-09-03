@@ -2,6 +2,11 @@
 
 Une application complète de gestion intelligente des risques RGPD pour les traitements de données à caractère personnel.
 
+## 📘 Description du Projet
+Smart DPO centralise la cartographie des traitements, l'évaluation des risques et le suivi des mesures correctives.
+La plateforme accompagne les DPO et responsables de traitement grâce à des tableaux de bord en temps réel et des
+alertes proactives pour garantir la conformité au RGPD.
+
 ## 🚀 Fonctionnalités
 
 ### ✅ Implémentées
@@ -45,6 +50,48 @@ smart-dpo/
     ├── app/           # Pages de l'application
     └── components/    # Composants réutilisables
 \`\`\`
+
+## ⚙️ Description Technique des Modules
+- **database/** : scripts SQL MySQL définissant le schéma et les données de référence.
+- **backend/** : API REST Node.js/Express gérant l'authentification, la logique métier, l'évaluation des risques et les exports.
+- **frontend/** : application Next.js/React en TypeScript avec Tailwind CSS et Recharts pour les tableaux de bord interactifs.
+- **scripts/** : utilitaires d'automatisation pour l'import Excel et d'autres tâches.
+- **public/** : ressources statiques partagées (images, icônes, etc.).
+
+### 🛣️ Routes API principales
+
+| Méthode | Route | Description |
+|---------|-------|-------------|
+| `POST` | `/api/auth/login` | Authentifier un utilisateur et renvoyer un jeton JWT |
+| `GET` | `/api/users` | Lister les utilisateurs (admin, dpo, super admin) |
+| `POST` | `/api/users` | Créer un utilisateur |
+| `PUT` | `/api/users/:id` | Mettre à jour un utilisateur |
+| `GET` | `/api/traitements` | Rechercher et lister les traitements avec filtres |
+| `GET` | `/api/traitements/:id` | Récupérer le détail d’un traitement |
+| `POST` | `/api/traitements` | Créer un traitement et évaluer le risque |
+| `PUT` | `/api/traitements/:id` | Mettre à jour un traitement |
+| `DELETE` | `/api/traitements/:id` | Supprimer un traitement |
+| `POST` | `/api/traitements/import` | Importer des traitements depuis un fichier Excel |
+| `GET` | `/api/risques` | Lister les risques associés à un traitement |
+| `POST` | `/api/risques` | Ajouter un risque |
+| `PUT` | `/api/risques/:id` | Mettre à jour un risque |
+| `GET` | `/api/mesures` | Lister les mesures correctives |
+| `POST` | `/api/mesures` | Créer une mesure corrective |
+| `PUT` | `/api/mesures/:id` | Mettre à jour une mesure |
+| `GET` | `/api/journal` | Historique des actions (audit trail) |
+| `GET` | `/api/alertes` | Lister les alertes générées automatiquement |
+| `PUT` | `/api/alertes/:id` | Marquer une alerte comme résolue ou modifier son statut |
+| `GET` | `/api/rapports/conformite` | Générer un rapport de conformité JSON |
+| `GET` | `/api/rapports/conformite/:format` | Exporter le rapport de conformité (`pdf`/`excel`) |
+| `GET` | `/api/rapports/risques/:format` | Exporter l’analyse des risques |
+| `GET` | `/api/rapports/activite/:format` | Exporter le journal d’activité |
+| `GET` | `/api/rapports/mesures/:format` | Exporter les mesures correctives |
+| `GET` | `/api/rapports/custom/pole/:format` | Rapport de conformité par pôle |
+| `GET` | `/api/rapports/custom/suivi/:format` | Suivi des mesures correctives |
+| `GET` | `/api/dashboard/stats` | Statistiques globales pour le tableau de bord |
+| `GET` | `/api/dashboard/evolution` | Évolution temporelle des traitements |
+
+Toutes les routes protégées utilisent les middlewares `auth` et `authorize` pour assurer la sécurité des accès.
 
 ## 🛠️ Installation
 
