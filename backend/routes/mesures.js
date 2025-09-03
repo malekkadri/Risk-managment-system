@@ -8,7 +8,7 @@ const authorize = require("../middleware/authorize")
 router.get(
   "/",
   auth,
-  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur"),
+  authorize("admin", "dpo", "super admin", "responsable du traitement"),
   async (req, res) => {
   try {
     const [mesures] = await db.query(`
@@ -31,7 +31,7 @@ router.get(
 router.post(
   "/",
   auth,
-  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur"),
+  authorize("admin", "dpo", "super admin", "responsable du traitement"),
   async (req, res) => {
   const { risque_id, description, type_mesure, priorite, responsable_id, date_echeance, cout_estime } = req.body
 
@@ -67,7 +67,7 @@ router.post(
 router.put(
   "/:id",
   auth,
-  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur"),
+  authorize("admin", "dpo", "super admin", "responsable du traitement"),
   async (req, res) => {
   const { description, type_mesure, priorite, statut, responsable_id, date_echeance, cout_estime } = req.body
 

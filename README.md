@@ -5,7 +5,7 @@ Une application complète de gestion intelligente des risques RGPD pour les trai
 ## 🚀 Fonctionnalités
 
 ### ✅ Implémentées
-- **UC01**: Authentification et gestion des rôles (DPO, Admin, Collaborateur)
+- **UC01**: Authentification et gestion des rôles (dpo, super admin, admin, responsable du traitement, sous traitant)
 - **UC02**: CRUD complet des traitements RGPD
 - **UC03**: Évaluation automatique des risques RGPD
 - **UC04**: Tableaux de bord avec visualisations par pôle, criticité, base légale
@@ -93,7 +93,7 @@ PORT=3001
 ### Accès par Défaut
 - **Email**: jean.dupont@example.com
 - **Mot de passe**: password123
-- **Rôle**: DPO
+- **Rôle**: dpo
 
 ## 📋 Cas d'Usage Implémentés
 

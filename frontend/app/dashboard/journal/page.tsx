@@ -16,7 +16,7 @@ export default function JournalPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [actionFilter, setActionFilter] = useState("all")
 
-  const role = useRoleGuard(["Admin", "DPO", "SuperAdmin"])
+  const role = useRoleGuard(["admin", "dpo", "super admin"])
 
   useEffect(() => {
     if (role) {

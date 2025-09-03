@@ -8,7 +8,7 @@ const authorize = require("../middleware/authorize")
 router.get(
   "/",
   auth,
-  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur"),
+  authorize("admin", "dpo", "super admin", "responsable du traitement"),
   async (req, res) => {
   try {
     const [alertes] = await db.query(`
@@ -30,7 +30,7 @@ router.get(
 router.put(
   "/:id/read",
   auth,
-  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur"),
+  authorize("admin", "dpo", "super admin", "responsable du traitement"),
   async (req, res) => {
   try {
     await db.query("UPDATE Alerte SET lu = TRUE WHERE id = ?", [req.params.id])

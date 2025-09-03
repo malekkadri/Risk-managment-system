@@ -23,7 +23,7 @@ export default function UsersPage() {
 
   const router = useRouter()
 
-  const role = useRoleGuard(["Admin", "DPO", "SuperAdmin"])
+  const role = useRoleGuard(["admin", "dpo", "super admin"])
 
   useEffect(() => {
     if (role) {
@@ -85,22 +85,31 @@ export default function UsersPage() {
 
   const getRoleBadge = (role: string) => {
     switch (role) {
-      case "DPO":
+      case "dpo":
         return (
           <Badge className="bg-purple-100 text-purple-800">
             <Shield className="w-3 h-3 mr-1" />
-            DPO
+            dpo
           </Badge>
         )
-      case "Admin":
+      case "admin":
         return (
           <Badge className="bg-blue-100 text-blue-800">
             <UsersIcon className="w-3 h-3 mr-1" />
-            Admin
+            admin
           </Badge>
         )
-      case "Collaborateur":
-        return <Badge className="bg-green-100 text-green-800">Collaborateur</Badge>
+      case "super admin":
+        return (
+          <Badge className="bg-red-100 text-red-800">
+            <Shield className="w-3 h-3 mr-1" />
+            super admin
+          </Badge>
+        )
+      case "responsable du traitement":
+        return <Badge className="bg-green-100 text-green-800">responsable du traitement</Badge>
+      case "sous traitant":
+        return <Badge className="bg-gray-100 text-gray-800">sous traitant</Badge>
       default:
         return <Badge variant="secondary">{role}</Badge>
     }
@@ -152,7 +161,7 @@ export default function UsersPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">DPO</p>
-                <p className="text-2xl font-bold">{users.filter((u) => u.role === "DPO").length}</p>
+                <p className="text-2xl font-bold">{users.filter((u) => u.role === "dpo").length}</p>
               </div>
               <Shield className="h-8 w-8 text-purple-500" />
             </div>
@@ -163,7 +172,7 @@ export default function UsersPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Admins</p>
-                <p className="text-2xl font-bold">{users.filter((u) => u.role === "Admin").length}</p>
+                <p className="text-2xl font-bold">{users.filter((u) => u.role === "admin").length}</p>
               </div>
               <UsersIcon className="h-8 w-8 text-blue-500" />
             </div>
@@ -173,8 +182,8 @@ export default function UsersPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Collaborateurs</p>
-                <p className="text-2xl font-bold">{users.filter((u) => u.role === "Collaborateur").length}</p>
+                <p className="text-sm font-medium text-muted-foreground">Responsables du traitement</p>
+                <p className="text-2xl font-bold">{users.filter((u) => u.role === "responsable du traitement").length}</p>
               </div>
               <UsersIcon className="h-8 w-8 text-green-500" />
             </div>

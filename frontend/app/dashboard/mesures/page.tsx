@@ -20,7 +20,7 @@ export default function MesuresPage() {
   const [filterStatus, setFilterStatus] = useState("all")
   const [showDialog, setShowDialog] = useState(false)
   const [editingMesure, setEditingMesure] = useState<any>(null)
-  const role = useRoleGuard(["Admin", "DPO", "SuperAdmin", "Collaborateur"])
+  const role = useRoleGuard(["admin", "dpo", "super admin", "responsable du traitement"])
 
   useEffect(() => {
     if (role) {
