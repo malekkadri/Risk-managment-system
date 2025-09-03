@@ -149,8 +149,11 @@ export default function RapportsPage() {
       a.download = `rapport-${reportId}.${format === "pdf" ? "pdf" : "xlsx"}`
       document.body.appendChild(a)
       a.click()
-      URL.revokeObjectURL(url)
-      document.body.removeChild(a)
+      // Ensure the browser has time to trigger the download before cleaning up
+      setTimeout(() => {
+        URL.revokeObjectURL(url)
+        document.body.removeChild(a)
+      }, 0)
 
       setProgress(p => ({ ...p, [reportId]: 100 }))
       setStatus(s => ({ ...s, [reportId]: "success" }))
@@ -188,6 +191,37 @@ export default function RapportsPage() {
   const handleGenerateAll = async (format: Format) => {
     for (const r of REPORTS) {
       await handleExport(r.id, format)
+    }
+  }
+
+  const downloadCustomReport = async (type: string, format: Format) => {
+    try {
+      const token = localStorage.getItem("token") || ""
+      const res = await fetch(`${API_BASE_URL}/api/rapports/custom/${type}/${format}`, {
+        headers: { "x-auth-token": token },
+      })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = `${type}.${format === "pdf" ? "pdf" : "xlsx"}`
+      document.body.appendChild(a)
+      a.click()
+      setTimeout(() => {
+        URL.revokeObjectURL(url)
+        document.body.removeChild(a)
+      }, 0)
+      toast({
+        title: "Export terminé",
+        description: `Rapport ${type} (${format.toUpperCase()}) téléchargé.`,
+      })
+    } catch {
+      toast({
+        title: "Erreur d’export",
+        description: `Impossible de générer le rapport ${type}.`,
+        variant: "destructive",
+      })
     }
   }
 
@@ -421,18 +455,26 @@ export default function RapportsPage() {
               <Card className="p-4">
                 <h3 className="font-semibold mb-2">Rapport par Pôle</h3>
                 <p className="text-sm text-muted-foreground mb-4">Analyse détaillée des traitements par département</p>
-                <Button variant="outline" size="sm">
-                  <Download className="mr-2 h-4 w-4" />
-                  Générer
-                </Button>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" onClick={() => downloadCustomReport("pole", "pdf")}>
+                    <Download className="mr-2 h-4 w-4" /> PDF
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => downloadCustomReport("pole", "excel")}>
+                    <Download className="mr-2 h-4 w-4" /> Excel
+                  </Button>
+                </div>
               </Card>
               <Card className="p-4">
                 <h3 className="font-semibold mb-2">Suivi des Mesures</h3>
                 <p className="text-sm text-muted-foreground mb-4">État d'avancement des mesures correctives</p>
-                <Button variant="outline" size="sm">
-                  <Download className="mr-2 h-4 w-4" />
-                  Générer
-                </Button>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" onClick={() => downloadCustomReport("suivi", "pdf")}>
+                    <Download className="mr-2 h-4 w-4" /> PDF
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => downloadCustomReport("suivi", "excel")}>
+                    <Download className="mr-2 h-4 w-4" /> Excel
+                  </Button>
+                </div>
               </Card>
             </div>
           </CardContent>
