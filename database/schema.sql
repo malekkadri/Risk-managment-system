@@ -116,7 +116,7 @@ CREATE TABLE IF NOT EXISTS Alerte (
 CREATE TABLE IF NOT EXISTS Rapport (
     id INT AUTO_INCREMENT PRIMARY KEY,
     titre VARCHAR(191) NOT NULL,  -- Réduit pour éviter les problèmes d'index
-    type_rapport ENUM('Conformité', 'Risques', 'Activité') NOT NULL,
+    type_rapport ENUM('Conformité', 'Risques', 'Activité', 'Mesures') NOT NULL,
     contenu JSON,
     genere_par INT,
     cree_le TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

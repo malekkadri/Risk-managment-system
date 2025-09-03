@@ -5,7 +5,7 @@ import { API_BASE_URL } from "@/lib/api"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Download, FileText, BarChart3, Activity, Upload } from "lucide-react"
+import { Download, FileText, BarChart3, Activity, Upload, ShieldCheck } from "lucide-react"
 import { useRoleGuard } from "@/hooks/useRoleGuard"
 
 export default function RapportsPage() {
@@ -82,6 +82,13 @@ export default function RapportsPage() {
       description: "Journal des actions et modifications récentes",
       icon: Activity,
       color: "bg-green-100 text-green-600",
+    },
+    {
+      id: "mesures",
+      title: "Plan des Mesures Correctives",
+      description: "Suivi détaillé des mesures correctives et leur statut",
+      icon: ShieldCheck,
+      color: "bg-purple-100 text-purple-600",
     },
   ]
 
