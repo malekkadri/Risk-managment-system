@@ -28,6 +28,7 @@ Une application complète de gestion intelligente des risques RGPD pour les trai
 ### 📈 Rapports et Analytics
 - Rapport de conformité RGPD
 - Analyse des risques par criticité
+- Plan des mesures correctives avec suivi de l'échéance
 - Export PDF et Excel
 - Rapports automatiques programmés
 

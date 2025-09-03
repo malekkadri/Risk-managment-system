@@ -53,6 +53,7 @@ async function buildReport(type) {
     case "conformite": {
       const [traitements] = await db.query(`
         SELECT t.nom, t.pole, t.base_legale, t.statut_conformite, t.duree_conservation,
+               t.nombre_personnes_concernees,
                COUNT(r.id) as nombre_risques, AVG(r.score_risque) as score_moyen
         FROM Traitement t
         LEFT JOIN Risque r ON t.id = r.traitement_id
@@ -81,6 +82,18 @@ async function buildReport(type) {
       `)
       return { data: actions, title: "Rapport d'Activité" }
     }
+    case "mesures": {
+      const [mesures] = await db.query(`
+        SELECT mc.*, r.type_risque, r.score_risque, t.nom as nom_traitement,
+               u.nom as responsable
+        FROM MesureCorrective mc
+        LEFT JOIN Risque r ON mc.risque_id = r.id
+        LEFT JOIN Traitement t ON r.traitement_id = t.id
+        LEFT JOIN Utilisateur u ON mc.responsable_id = u.id
+        ORDER BY mc.date_echeance, mc.priorite DESC
+      `)
+      return { data: mesures, title: "Plan des Mesures Correctives" }
+    }
     default:
       throw new Error("Type de rapport invalide")
   }
@@ -106,13 +119,19 @@ function exportReport(type, format, data, title, res) {
     let y = 160
     if (type === "conformite") {
       data.forEach((item) => {
-        doc.text(`${item.nom} - ${item.statut_conformite}`, 100, y)
+        doc.text(
+          `${item.nom} - ${item.statut_conformite} | Risques: ${item.nombre_risques} | Score: ${
+            item.score_moyen ? Number(item.score_moyen).toFixed(2) : 0
+          }`,
+          100,
+          y,
+        )
         y += 20
       })
     } else if (type === "risques") {
       data.forEach((item) => {
         doc.text(
-          `${item.nom_traitement} - ${item.type_risque} (${item.score_risque})`,
+          `${item.nom_traitement} - ${item.type_risque} (Score: ${item.score_risque}, C:${item.criticite} P:${item.probabilite} I:${item.impact})`,
           100,
           y,
         )
@@ -121,7 +140,21 @@ function exportReport(type, format, data, title, res) {
     } else if (type === "activite") {
       data.forEach((item) => {
         doc.text(
-          `${new Date(item.date_action).toLocaleDateString("fr-FR")} - ${item.nom_utilisateur} : ${item.action}`,
+          `${new Date(item.date_action).toLocaleDateString("fr-FR")} - ${item.nom_utilisateur} sur ${
+            item.nom_traitement || "N/A"
+          } : ${item.action}`,
+          100,
+          y,
+        )
+        y += 20
+      })
+    } else if (type === "mesures") {
+      data.forEach((item) => {
+        const date = item.date_echeance
+          ? new Date(item.date_echeance).toLocaleDateString("fr-FR")
+          : "N/A"
+        doc.text(
+          `${item.nom_traitement} - ${item.description} (${item.priorite}, ${item.statut}) - ${date}`,
           100,
           y,
         )
@@ -188,6 +221,21 @@ router.get(
     try {
       const { data, title } = await buildReport("activite")
       exportReport("activite", req.params.format, data, title, res)
+    } catch (err) {
+      console.error(err.message)
+      res.status(500).send("Erreur serveur")
+    }
+  },
+)
+
+router.get(
+  "/mesures/:format",
+  auth,
+  authorize("Admin", "DPO", "SuperAdmin", "Collaborateur", "Rapport"),
+  async (req, res) => {
+    try {
+      const { data, title } = await buildReport("mesures")
+      exportReport("mesures", req.params.format, data, title, res)
     } catch (err) {
       console.error(err.message)
       res.status(500).send("Erreur serveur")
