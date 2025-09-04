@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { AlertTriangle, Plus, Eye, Edit } from "lucide-react"
+import { AlertTriangle, Plus, Eye, Edit, Trash2 } from "lucide-react"
 import { RisqueDialog } from "@/components/risque-dialog"
 import { useRoleGuard } from "@/hooks/useRoleGuard"
 
@@ -82,6 +82,23 @@ export default function RisquesPage() {
         return <Badge className="bg-gray-100 text-gray-800 border border-gray-200">Résiduel</Badge>
       default:
         return <Badge variant="secondary">{status}</Badge>
+    }
+  }
+
+  const handleDelete = async (id: number) => {
+    if (confirm("Êtes-vous sûr de vouloir supprimer ce risque ?")) {
+      try {
+        const token = localStorage.getItem("token")
+        const res = await fetch(`${API_BASE_URL}/api/risques/${id}`, {
+          method: "DELETE",
+          headers: { "x-auth-token": token || "" },
+        })
+        if (res.ok) {
+          fetchRisques()
+        }
+      } catch (error) {
+        console.error("Erreur lors de la suppression:", error)
+      }
     }
   }
 
@@ -216,6 +233,14 @@ export default function RisquesPage() {
                           }}
                         >
                           <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          title="Supprimer"
+                          onClick={() => handleDelete(risque.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                     </TableCell>
