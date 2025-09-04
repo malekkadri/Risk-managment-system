@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Search, Shield, CheckCircle, AlertTriangle, Clock, Edit } from "lucide-react"
+import { Plus, Search, Shield, CheckCircle, AlertTriangle, Clock, Edit, Trash2 } from "lucide-react"
 import { API_BASE_URL } from "@/lib/api"
 import { MesureDialog } from "@/components/mesure-dialog"
 import { useRoleGuard } from "@/hooks/useRoleGuard"
@@ -94,6 +94,23 @@ export default function MesuresPage() {
         return <Badge variant="secondary">Basse</Badge>
       default:
         return <Badge variant="secondary">{priorite}</Badge>
+    }
+  }
+
+  const handleDelete = async (id: number) => {
+    if (confirm("Êtes-vous sûr de vouloir supprimer cette mesure ?")) {
+      try {
+        const token = localStorage.getItem("token")
+        const res = await fetch(`${API_BASE_URL}/api/mesures/${id}`, {
+          method: "DELETE",
+          headers: { "x-auth-token": token || "" },
+        })
+        if (res.ok) {
+          fetchMesures()
+        }
+      } catch (error) {
+        console.error("Erreur lors de la suppression:", error)
+      }
     }
   }
 
@@ -199,16 +216,25 @@ export default function MesuresPage() {
                       : "-"}
                   </TableCell>
                   <TableCell>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        setEditingMesure(mesure)
-                        setShowDialog(true)
-                      }}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setEditingMesure(mesure)
+                          setShowDialog(true)
+                        }}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete(mesure.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
