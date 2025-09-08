@@ -40,7 +40,7 @@ alertes proactives pour garantir la conformité au RGPD.
 ## 🏗️ Architecture
 
 \`\`\`
-smart-dpo/
+risk-managment/
 ├── database/           # Scripts SQL et schéma de base
 ├── backend/           # API Node.js/Express
 │   ├── routes/        # Routes API
