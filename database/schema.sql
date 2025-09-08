@@ -4,6 +4,16 @@ CREATE DATABASE IF NOT EXISTS smart_dpo CHARACTER SET utf8mb4 COLLATE utf8mb4_un
 -- Utilisation de la base de données
 USE smart_dpo;
 
+-- Table: ApplicationSettings
+CREATE TABLE IF NOT EXISTS ApplicationSettings (
+    id INT PRIMARY KEY DEFAULT 1,
+    app_name VARCHAR(255) NOT NULL
+);
+
+INSERT INTO ApplicationSettings (id, app_name)
+VALUES (1, 'Smart DPO')
+ON DUPLICATE KEY UPDATE app_name = VALUES(app_name);
+
 -- Table: Utilisateur
 CREATE TABLE IF NOT EXISTS Utilisateur (
     id INT AUTO_INCREMENT PRIMARY KEY,

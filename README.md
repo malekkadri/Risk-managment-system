@@ -101,10 +101,12 @@ Toutes les routes protégées utilisent les middlewares `auth` et `authorize` po
 - WAMP/XAMPP (pour le développement local)
 
 ### 1. Base de Données
-\`\`\`bash
-# Importer le schéma dans MySQL
+```bash
+# Importer le schéma et les paramètres d'application
 mysql -u root -p smart_dpo < database/schema.sql
-\`\`\`
+# Pour les installations existantes, initialiser la table ApplicationSettings
+mysql -u root -p smart_dpo < database/add_app_name_setting.sql
+```
 
 ### 2. Backend
 \`\`\`bash
@@ -136,6 +138,8 @@ DB_NAME=smart_dpo
 JWT_SECRET=votre_cle_secrete_jwt
 PORT=3001
 \`\`\`
+### Personnalisation du nom de l'application
+Le nom affiché dans l'interface (par défaut "Smart DPO") est stocké dans la table `ApplicationSettings`. Vous pouvez le modifier depuis la page **Paramètres** ou via l'endpoint `PUT /api/settings/app-name`.
 
 ### Accès par Défaut
 - **Email**: jean.dupont@example.com
