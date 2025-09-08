@@ -1,10 +1,10 @@
-# Smart DPO - Application de Gestion RGPD
+# risk managment- Application de Gestion RGPD
 
 Une application complète de gestion intelligente des risques RGPD pour les traitements de données à caractère personnel.
 
 ## 📘 Description du Projet
-Smart DPO centralise la cartographie des traitements, l'évaluation des risques et le suivi des mesures correctives.
-La plateforme accompagne les DPO et responsables de traitement grâce à des tableaux de bord en temps réel et des
+risk managmentcentralise la cartographie des traitements, l'évaluation des risques et le suivi des mesures correctives.
+La plateforme accompagne les Riskadminet responsables de traitement grâce à des tableaux de bord en temps réel et des
 alertes proactives pour garantir la conformité au RGPD.
 
 ## 🚀 Fonctionnalités
@@ -103,9 +103,9 @@ Toutes les routes protégées utilisent les middlewares `auth` et `authorize` po
 ### 1. Base de Données
 ```bash
 # Importer le schéma et les paramètres d'application
-mysql -u root -p smart_dpo < database/schema.sql
+mysql -u root -p smart_Riskadmin< database/schema.sql
 # Pour les installations existantes, initialiser la table ApplicationSettings
-mysql -u root -p smart_dpo < database/add_app_name_setting.sql
+mysql -u root -p smart_Riskadmin< database/add_app_name_setting.sql
 ```
 
 ### 2. Backend
