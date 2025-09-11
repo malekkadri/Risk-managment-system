@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    const { model, messages } = await req.json();
+    const { model = "llama-3.1-8b-instant", messages } = await req.json();
 
     // Strip unsupported properties such as `ts` before forwarding to Groq
     const cleanMessages = Array.isArray(messages)
@@ -15,7 +15,7 @@ export async function POST(req: Request) {
 
     console.log("/api/chat request", { model, messages: cleanMessages });
 
-    const apiKey = process.env.GROQ_API_KEY;
+    const apiKey = process.env.GROQ_API_KEY?.trim();
     if (!apiKey) {
       console.error("GROQ_API_KEY is missing");
       return NextResponse.json({ error: "Missing GROQ_API_KEY" }, { status: 500 });
