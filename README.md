@@ -1,10 +1,10 @@
-# risk managment- Application de Gestion RGPD
+# Smart DPO - Application de Gestion RGPD
 
 Une application complète de gestion intelligente des risques RGPD pour les traitements de données à caractère personnel.
 
 ## 📘 Description du Projet
-risk managmentcentralise la cartographie des traitements, l'évaluation des risques et le suivi des mesures correctives.
-La plateforme accompagne les Riskadminet responsables de traitement grâce à des tableaux de bord en temps réel et des
+Smart DPO centralise la cartographie des traitements, l'évaluation des risques et le suivi des mesures correctives.
+La plateforme accompagne les DPO et responsables de traitement grâce à des tableaux de bord en temps réel et des
 alertes proactives pour garantir la conformité au RGPD.
 
 ## 🚀 Fonctionnalités
@@ -40,7 +40,7 @@ alertes proactives pour garantir la conformité au RGPD.
 ## 🏗️ Architecture
 
 \`\`\`
-risk-managment/
+smart-dpo/
 ├── database/           # Scripts SQL et schéma de base
 ├── backend/           # API Node.js/Express
 │   ├── routes/        # Routes API
@@ -101,12 +101,10 @@ Toutes les routes protégées utilisent les middlewares `auth` et `authorize` po
 - WAMP/XAMPP (pour le développement local)
 
 ### 1. Base de Données
-```bash
-# Importer le schéma et les paramètres d'application
-mysql -u root -p smart_Riskadmin< database/schema.sql
-# Pour les installations existantes, initialiser la table ApplicationSettings
-mysql -u root -p smart_Riskadmin< database/add_app_name_setting.sql
-```
+\`\`\`bash
+# Importer le schéma dans MySQL
+mysql -u root -p smart_dpo < database/schema.sql
+\`\`\`
 
 ### 2. Backend
 \`\`\`bash
@@ -138,8 +136,6 @@ DB_NAME=smart_dpo
 JWT_SECRET=votre_cle_secrete_jwt
 PORT=3001
 \`\`\`
-### Personnalisation du nom de l'application
-Le nom affiché dans l'interface (par défaut "Smart DPO") est stocké dans la table `ApplicationSettings`. Vous pouvez le modifier depuis la page **Paramètres** ou via l'endpoint `PUT /api/settings/app-name`.
 
 ### Accès par Défaut
 - **Email**: jean.dupont@example.com

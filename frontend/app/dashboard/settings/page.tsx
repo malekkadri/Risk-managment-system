@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -21,7 +21,6 @@ import {
   Info,
 } from "lucide-react"
 import { useRoleGuard } from "@/hooks/useRoleGuard"
-import { API_BASE_URL } from "@/lib/api"
 
 export default function SettingsPage() {
   const [settings, setSettings] = useState({
@@ -53,21 +52,6 @@ export default function SettingsPage() {
     },
   })
 
-  const [appName, setAppName] = useState("Smart DPO")
-
-  useEffect(() => {
-    const fetchAppName = async () => {
-      try {
-        const res = await fetch(`${API_BASE_URL}/api/settings/app-name`)
-        const data = await res.json()
-        setAppName(data.appName)
-      } catch (error) {
-        console.error("Erreur lors du chargement du nom de l'application:", error)
-      }
-    }
-    fetchAppName()
-  }, [])
-
   const [loading, setLoading] = useState(false)
   const [saved, setSaved] = useState(false)
   useRoleGuard(["admin", "dpo", "super admin"])
@@ -75,11 +59,7 @@ export default function SettingsPage() {
   const handleSave = async () => {
     setLoading(true)
     try {
-      await fetch(`${API_BASE_URL}/api/settings/app-name`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ appName }),
-      })
+      // Simulation de sauvegarde
       await new Promise((resolve) => setTimeout(resolve, 1000))
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
@@ -109,7 +89,7 @@ export default function SettingsPage() {
             <Settings className="mr-3 h-8 w-8 text-primary" />
             Paramètres
           </h1>
-          <p className="text-muted-foreground">Configurez votre application {appName}</p>
+          <p className="text-muted-foreground">Configurez votre application Smart DPO</p>
         </div>
         <Button onClick={handleSave} disabled={loading} className="shadow-lg">
           {loading ? (
@@ -264,10 +244,6 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="appName">Nom de l'application</Label>
-              <Input id="appName" value={appName} onChange={(e) => setAppName(e.target.value)} />
-            </div>
-            <div className="space-y-2">
               <Label htmlFor="language">Langue</Label>
               <Select
                 value={settings.system.language}
@@ -408,7 +384,7 @@ export default function SettingsPage() {
               <Info className="h-8 w-8 text-blue-600" />
               <div>
                 <h3 className="font-semibold text-blue-900">Version</h3>
-                <p className="text-sm text-blue-700">{appName} v1.0.0</p>
+                <p className="text-sm text-blue-700">Smart DPO v1.0.0</p>
               </div>
             </div>
           </CardContent>

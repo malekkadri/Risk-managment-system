@@ -1,4 +1,4 @@
--- Additional sample data for risk managmentdatabase
+-- Additional sample data for Smart DPO database
 USE smart_dpo;
 
 -- Insert additional users

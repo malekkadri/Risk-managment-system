@@ -21,7 +21,7 @@ Si vous avez téléchargé le projet sous forme de fichier ZIP, décompressez-le
 Si vous utilisez Git, clonez le dépôt :
 \`\`\`bash
 git clone <votre-repo-url>
-cd risk-managment-app
+cd smart-dpo-app
 \`\`\`
 
 ### 2. Navigation vers le dossier frontend

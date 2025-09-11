@@ -1,7 +1,7 @@
 {
-  "name": "risk-managment-backend",
+  "name": "smart-dpo-backend",
   "version": "1.0.0",
-  "description": "Backend for risk managmentapplication",
+  "description": "Backend for Smart DPO application",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

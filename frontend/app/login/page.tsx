@@ -173,24 +173,6 @@ export default function LoginPage() {
               </Button>
             </form>
 
-            {/* Demo Credentials */}
-            <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 backdrop-blur-sm rounded-2xl p-6 border border-blue-500/30">
-              <div className="flex items-center mb-3">
-                <Sparkles className="w-5 h-5 text-blue-400 mr-2" />
-                <h4 className="font-semibold text-blue-200">Compte de démonstration</h4>
-              </div>
-              <div className="text-sm text-blue-100 space-y-2">
-                <div className="flex items-center">
-                  <Mail className="w-3 h-3 mr-2 text-blue-300" />
-                  <span className="font-mono">jean.dupont@example.com</span>
-                </div>
-                <div className="flex items-center">
-                  <Lock className="w-3 h-3 mr-2 text-blue-300" />
-                  <span className="font-mono">password123</span>
-                </div>
-              </div>
-            </div>
-
             {/* Footer Links */}
             <div className="text-center space-y-4">
               <Button variant="link" className="text-purple-300 hover:text-purple-200 text-sm">

@@ -26,14 +26,8 @@ cron.schedule("0 * * * *", () => {
 })
 
 // Routes
-app.get("/", async (req, res) => {
-  try {
-    const [rows] = await db.query("SELECT app_name FROM ApplicationSettings LIMIT 1")
-    const appName = rows.length > 0 ? rows[0].app_name : "Smart DPO"
-    res.send(`${appName} API is running...`)
-  } catch (err) {
-    res.send("API is running...")
-  }
+app.get("/", (req, res) => {
+  res.send("Smart DPO API is running...")
 })
 
 app.use("/api/auth", require("./routes/auth"))
@@ -45,7 +39,6 @@ app.use("/api/journal", require("./routes/journal"))
 app.use("/api/alertes", require("./routes/alertes"))
 app.use("/api/rapports", require("./routes/rapports"))
 app.use("/api/dashboard", require("./routes/dashboard"))
-app.use("/api/settings", require("./routes/settings"))
 
 const PORT = process.env.PORT || 3001
 
