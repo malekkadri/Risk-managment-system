@@ -2,12 +2,17 @@ const express = require("express")
 const router = express.Router()
 const db = require("../config/db")
 const auth = require("../middleware/auth")
+const authorize = require("../middleware/authorize")
 
 // Statistiques générales du tableau de bord
-router.get("/stats", auth, async (req, res) => {
-  try {
-    // Nombre total de traitements
-    const [totalTraitements] = await db.query("SELECT COUNT(*) as total FROM Traitement")
+router.get(
+  "/stats",
+  auth,
+  authorize("admin", "dpo", "super admin", "responsable du traitement", "sous traitant"),
+  async (req, res) => {
+    try {
+      // Nombre total de traitements
+      const [totalTraitements] = await db.query("SELECT COUNT(*) as total FROM Traitement")
 
     // Répartition par statut de conformité
     const [conformite] = await db.query(`
@@ -40,6 +45,12 @@ router.get("/stats", auth, async (req, res) => {
     // Alertes non lues
     const [alertes] = await db.query("SELECT COUNT(*) as total FROM Alerte WHERE lu = FALSE")
 
+    // Statistiques des utilisateurs
+    const [users] = await db.query(
+      "SELECT role, COUNT(*) as count FROM Utilisateur GROUP BY role"
+    )
+    const totalUsers = users.reduce((sum, u) => sum + u.count, 0)
+
     // Répartition par pôle
     const [poles] = await db.query(`
       SELECT pole, COUNT(*) as count 
@@ -55,6 +66,8 @@ router.get("/stats", auth, async (req, res) => {
       mesures,
       alertesNonLues: alertes[0].total,
       poles,
+      totalUsers,
+      utilisateurs: users,
     })
   } catch (err) {
     console.error(err.message)
@@ -63,23 +76,27 @@ router.get("/stats", auth, async (req, res) => {
 })
 
 // Évolution temporelle
-router.get("/evolution", auth, async (req, res) => {
-  try {
-    const [evolution] = await db.query(`
-      SELECT 
+router.get(
+  "/evolution",
+  auth,
+  authorize("admin", "dpo", "super admin", "responsable du traitement", "sous traitant"),
+  async (req, res) => {
+    try {
+      const [evolution] = await db.query(`
+      SELECT
         DATE_FORMAT(cree_le, '%Y-%m') as mois,
         COUNT(*) as nouveaux_traitements
-      FROM Traitement 
+      FROM Traitement
       WHERE cree_le >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
       GROUP BY DATE_FORMAT(cree_le, '%Y-%m')
       ORDER BY mois
     `)
-
-    res.json(evolution)
-  } catch (err) {
-    console.error(err.message)
-    res.status(500).send("Erreur serveur")
+      res.json(evolution)
+    } catch (err) {
+      console.error(err.message)
+      res.status(500).send("Erreur serveur")
+    }
   }
-})
+)
 
 module.exports = router
