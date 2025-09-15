@@ -73,7 +73,10 @@ export function Sidebar() {
     if (stored) {
       try {
         const parsed = JSON.parse(stored)
-        const role = typeof parsed.role === "string" ? parsed.role.toLowerCase().trim() : null
+        const role =
+          typeof parsed.role === "string"
+            ? parsed.role.toLowerCase().replace(/_/g, " ").trim()
+            : null
         setUserRole(role)
       } catch {
         setUserRole(null)

@@ -29,6 +29,7 @@ import {
   Calendar,
   Activity,
   ArrowRight,
+  Users,
 } from "lucide-react"
 import Link from "next/link"
 
@@ -120,7 +121,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         <Card className="border-l-4 border-l-blue-500 hover:shadow-lg transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-600">Total Traitements</CardTitle>
@@ -162,6 +163,19 @@ export default function DashboardPage() {
             </div>
             <Progress value={75} className="mt-3" />
             <div className="text-sm text-gray-600 mt-2">75% terminées</div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-l-4 border-l-purple-500 hover:shadow-lg transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">Utilisateurs</CardTitle>
+            <Users className="h-5 w-5 text-purple-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-gray-900">{stats?.totalUsers || 0}</div>
+            <div className="text-sm text-gray-600 mt-2">
+              {stats?.utilisateurs?.length || 0} rôles
+            </div>
           </CardContent>
         </Card>
 
