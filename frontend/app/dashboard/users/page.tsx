@@ -77,7 +77,7 @@ export default function UsersPage() {
     dpo: "DPO",
     admin: "Admin",
     "super admin": "Super Admin",
-    "responsable du traitement": "Responsable de traitement",
+    "responsable du traitement": "Responsables du traitement",
     "sous traitant": "Sous-traitant",
   }
 
@@ -121,16 +121,43 @@ export default function UsersPage() {
   }
 
   const normalizeRole = (roleValue: string | null | undefined) => {
-    const [first] = parseRoleEntries(roleValue)
-    return first?.normalized || ""
-  }
+    const entries = parseRoleEntries(roleValue)
+    const priorities = [
+      "super admin",
+      "admin",
+      "dpo",
+      "responsable du traitement",
+      "sous traitant",
+    ]
 
-  const hasRole = (roleValue: string | null | undefined, expected: string) => {
-    return parseRoleEntries(roleValue).some((entry) => entry.normalized === expected)
+    for (const priority of priorities) {
+      if (entries.some((entry) => entry.normalized === priority)) {
+        return priority
+      }
+    }
+
+    return entries[0]?.normalized || ""
   }
 
   const normalizedCurrentRole = normalizeRole(role)
   const canManageUsers = ["admin", "dpo", "super admin"].includes(normalizedCurrentRole)
+
+  const roleCounts = users.reduce((acc, user) => {
+    parseRoleEntries(user.role).forEach(({ normalized }) => {
+      if (!normalized) {
+        return
+      }
+
+      acc[normalized] = (acc[normalized] || 0) + 1
+    })
+    return acc
+  }, {} as Record<string, number>)
+
+  const dpoCount = roleCounts["dpo"] || 0
+  const adminCount = roleCounts["admin"] || 0
+  const superAdminCount = roleCounts["super admin"] || 0
+  const responsablesCount = roleCounts["responsable du traitement"] || 0
+  const sousTraitantCount = roleCounts["sous traitant"] || 0
 
   const fetchUsers = async () => {
     try {
@@ -288,15 +315,26 @@ export default function UsersPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
         <Card className="border-l-4 border-l-purple-500">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">DPO</p>
-                <p className="text-2xl font-bold">{users.filter((u) => hasRole(u.role, "dpo")).length}</p>
+                <p className="text-2xl font-bold">{dpoCount}</p>
               </div>
               <Shield className="h-8 w-8 text-purple-500" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="border-l-4 border-l-red-500">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Super Admins</p>
+                <p className="text-2xl font-bold">{superAdminCount}</p>
+              </div>
+              <Shield className="h-8 w-8 text-red-500" />
             </div>
           </CardContent>
         </Card>
@@ -305,7 +343,7 @@ export default function UsersPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Admins</p>
-                <p className="text-2xl font-bold">{users.filter((u) => hasRole(u.role, "admin")).length}</p>
+                <p className="text-2xl font-bold">{adminCount}</p>
               </div>
               <UsersIcon className="h-8 w-8 text-blue-500" />
             </div>
@@ -315,8 +353,13 @@ export default function UsersPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Responsables du traitement</p>
-                <p className="text-2xl font-bold">{users.filter((u) => hasRole(u.role, "responsable du traitement")).length}</p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Responsables du traitement &amp; Sous-traitants
+                </p>
+                <p className="text-2xl font-bold">{responsablesCount + sousTraitantCount}</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {responsablesCount} responsables • {sousTraitantCount} sous-traitants
+                </p>
               </div>
               <UsersIcon className="h-8 w-8 text-green-500" />
             </div>
