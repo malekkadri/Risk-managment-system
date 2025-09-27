@@ -32,12 +32,12 @@ export default function UsersPage() {
     filterUsers()
   }, [users, searchTerm])
 
-  const normalizeRole = (role: string | null | undefined) => {
-    if (!role) {
+  const normalizeSingleRole = (roleValue: string | null | undefined) => {
+    if (!roleValue) {
       return ""
     }
 
-    const base = role
+    const base = roleValue
       .toString()
       .toLowerCase()
       .normalize("NFD")
@@ -46,23 +46,31 @@ export default function UsersPage() {
       .replace(/\s+/g, " ")
       .trim()
 
-    switch (base) {
-      case "superadmin":
-        return "super admin"
-      case "responsable du traitement":
-      case "responsable de traitement":
-      case "responsable traitement":
-      case "responsable":
-        return "responsable du traitement"
-      case "soustraitant":
-      case "sous traitant":
-      case "sous traitants":
-      case "sous-traitant":
-      case "sous-traitants":
-        return "sous traitant"
-      default:
-        return base
+    if (!base) {
+      return ""
     }
+
+    if (base === "dpo") {
+      return "dpo"
+    }
+
+    if (base === "admin" || base === "administrateur" || base === "administratrice") {
+      return "admin"
+    }
+
+    if (base === "superadmin" || (base.includes("super") && base.includes("admin"))) {
+      return "super admin"
+    }
+
+    if (base.includes("responsable") && base.includes("traitement")) {
+      return "responsable du traitement"
+    }
+
+    if (base.includes("sous") && base.includes("traitant")) {
+      return "sous traitant"
+    }
+
+    return base
   }
 
   const roleLabels: Record<string, string> = {
@@ -73,18 +81,52 @@ export default function UsersPage() {
     "sous traitant": "Sous-traitant",
   }
 
-  const formatRoleLabel = (role: string | null | undefined) => {
-    const normalized = normalizeRole(role)
-
-    if (!normalized) {
-      return ""
-    }
-
-    if (roleLabels[normalized]) {
+  const getRoleDisplayLabel = (normalized: string, raw: string) => {
+    if (normalized && roleLabels[normalized]) {
       return roleLabels[normalized]
     }
 
-    return normalized.replace(/\b\w/g, (letter) => letter.toUpperCase())
+    const base = (normalized || raw || "").toString().trim()
+
+    if (!base) {
+      return ""
+    }
+
+    return base.replace(/\s+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase())
+  }
+
+  const parseRoleEntries = (roleValue: string | null | undefined) => {
+    if (!roleValue) {
+      return []
+    }
+
+    const sanitized = roleValue
+      .toString()
+      .replace(/[–—]/g, "-")
+      .replace(/\s*[-]\s*/g, ",")
+
+    const segments = sanitized
+      .split(/[,/;|]/)
+      .flatMap((part) => part.split(/\bet\b|\bou\b|&/gi))
+      .map((segment) => segment.trim())
+      .filter(Boolean)
+
+    return segments.map((segment) => {
+      const normalized = normalizeSingleRole(segment)
+      return {
+        normalized,
+        label: getRoleDisplayLabel(normalized, segment),
+      }
+    })
+  }
+
+  const normalizeRole = (roleValue: string | null | undefined) => {
+    const [first] = parseRoleEntries(roleValue)
+    return first?.normalized || ""
+  }
+
+  const hasRole = (roleValue: string | null | undefined, expected: string) => {
+    return parseRoleEntries(roleValue).some((entry) => entry.normalized === expected)
   }
 
   const normalizedCurrentRole = normalizeRole(role)
@@ -143,44 +185,60 @@ export default function UsersPage() {
     }
   }
 
-  const getRoleBadge = (role: string) => {
-    const normalizedRole = normalizeRole(role)
+  const renderRoleBadges = (roleValue: string | null | undefined) => {
+    const entries = parseRoleEntries(roleValue)
 
-    switch (normalizedRole) {
-      case "dpo":
-        return (
-          <Badge className="bg-purple-100 text-purple-800">
-            <Shield className="w-3 h-3 mr-1" />
-            {formatRoleLabel(role)}
-          </Badge>
-        )
-      case "admin":
-        return (
-          <Badge className="bg-blue-100 text-blue-800">
-            <UsersIcon className="w-3 h-3 mr-1" />
-            {formatRoleLabel(role)}
-          </Badge>
-        )
-      case "super admin":
-        return (
-          <Badge className="bg-red-100 text-red-800">
-            <Shield className="w-3 h-3 mr-1" />
-            {formatRoleLabel(role)}
-          </Badge>
-        )
-      case "responsable du traitement":
-        return (
-          <Badge className="bg-green-100 text-green-800">
-            {formatRoleLabel(role)}
-          </Badge>
-        )
-      case "sous traitant":
-        return (
-          <Badge className="bg-gray-100 text-gray-800">{formatRoleLabel(role)}</Badge>
-        )
-      default:
-        return <Badge variant="secondary">{formatRoleLabel(role) || "—"}</Badge>
+    if (entries.length === 0) {
+      return <Badge variant="secondary">—</Badge>
     }
+
+    return (
+      <div className="flex flex-wrap gap-1">
+        {entries.map(({ normalized, label }, index) => {
+          const key = `${normalized || label}-${index}`
+
+          switch (normalized) {
+            case "dpo":
+              return (
+                <Badge key={key} className="bg-purple-100 text-purple-800">
+                  <Shield className="w-3 h-3 mr-1" />
+                  {label}
+                </Badge>
+              )
+            case "admin":
+              return (
+                <Badge key={key} className="bg-blue-100 text-blue-800">
+                  <UsersIcon className="w-3 h-3 mr-1" />
+                  {label}
+                </Badge>
+              )
+            case "super admin":
+              return (
+                <Badge key={key} className="bg-red-100 text-red-800">
+                  <Shield className="w-3 h-3 mr-1" />
+                  {label}
+                </Badge>
+              )
+            case "responsable du traitement":
+              return (
+                <Badge key={key} className="bg-green-100 text-green-800">
+                  {label}
+                </Badge>
+              )
+            case "sous traitant":
+              return (
+                <Badge key={key} className="bg-gray-100 text-gray-800">{label}</Badge>
+              )
+            default:
+              return (
+                <Badge key={key} variant="secondary">
+                  {label || "—"}
+                </Badge>
+              )
+          }
+        })}
+      </div>
+    )
   }
 
   const getStatusBadge = (actif: boolean) => {
@@ -236,7 +294,7 @@ export default function UsersPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">DPO</p>
-                <p className="text-2xl font-bold">{users.filter((u) => normalizeRole(u.role) === "dpo").length}</p>
+                <p className="text-2xl font-bold">{users.filter((u) => hasRole(u.role, "dpo")).length}</p>
               </div>
               <Shield className="h-8 w-8 text-purple-500" />
             </div>
@@ -247,7 +305,7 @@ export default function UsersPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Admins</p>
-                <p className="text-2xl font-bold">{users.filter((u) => normalizeRole(u.role) === "admin").length}</p>
+                <p className="text-2xl font-bold">{users.filter((u) => hasRole(u.role, "admin")).length}</p>
               </div>
               <UsersIcon className="h-8 w-8 text-blue-500" />
             </div>
@@ -258,7 +316,7 @@ export default function UsersPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Responsables du traitement</p>
-                <p className="text-2xl font-bold">{users.filter((u) => normalizeRole(u.role) === "responsable du traitement").length}</p>
+                <p className="text-2xl font-bold">{users.filter((u) => hasRole(u.role, "responsable du traitement")).length}</p>
               </div>
               <UsersIcon className="h-8 w-8 text-green-500" />
             </div>
@@ -329,7 +387,7 @@ export default function UsersPage() {
                     </div>
                   </TableCell>
                   <TableCell className="text-muted-foreground">{user.email}</TableCell>
-                  <TableCell>{getRoleBadge(user.role)}</TableCell>
+                  <TableCell>{renderRoleBadges(user.role)}</TableCell>
                   <TableCell>{getStatusBadge(Boolean(user.actif))}</TableCell>
                   <TableCell className="text-muted-foreground">
                     {new Date(user.cree_le).toLocaleDateString("fr-FR")}
