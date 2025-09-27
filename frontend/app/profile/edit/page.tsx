@@ -12,6 +12,8 @@ export default function EditProfilePage() {
   const [nom, setNom] = useState("")
   const [email, setEmail] = useState("")
   const [userId, setUserId] = useState<number | null>(null)
+  const [role, setRole] = useState<string | null>(null)
+  const [actif, setActif] = useState<boolean>(true)
 
   useEffect(() => {
     const stored = localStorage.getItem("user")
@@ -20,6 +22,8 @@ export default function EditProfilePage() {
       setNom(u.nom || "")
       setEmail(u.email || "")
       setUserId(u.id)
+      setRole(typeof u.role === "string" ? u.role : null)
+      setActif(u.actif !== undefined ? Boolean(u.actif) : true)
     }
   }, [])
 
@@ -28,13 +32,24 @@ export default function EditProfilePage() {
     if (!userId) return
     const token = localStorage.getItem("token")
     try {
+      const payload: Record<string, unknown> = {
+        nom,
+        email,
+      }
+
+      if (typeof role === "string") {
+        payload.role = role
+      }
+
+      payload.actif = actif
+
       const res = await fetch(`${API_BASE_URL}/api/users/${userId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           "x-auth-token": token || "",
         },
-        body: JSON.stringify({ nom, email }),
+        body: JSON.stringify(payload),
       })
       if (res.ok) {
         const updated = await res.json()
