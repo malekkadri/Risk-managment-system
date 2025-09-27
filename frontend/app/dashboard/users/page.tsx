@@ -32,7 +32,29 @@ export default function UsersPage() {
     filterUsers()
   }, [users, searchTerm])
 
-  const normalizeRole = (role: string | null | undefined) => role?.toLowerCase().trim() || ""
+  const normalizeRole = (role: string | null | undefined) =>
+    role?.toLowerCase().replace(/[_-]+/g, " ").replace(/\s+/g, " ").trim() || ""
+
+  const formatRoleLabel = (role: string | null | undefined) => {
+    const normalized = normalizeRole(role)
+
+    switch (normalized) {
+      case "dpo":
+        return "DPO"
+      case "admin":
+        return "Admin"
+      case "super admin":
+        return "Super Admin"
+      case "responsable du traitement":
+        return "Responsable du traitement"
+      case "sous traitant":
+        return "Sous-traitant"
+      default:
+        return normalized
+          ? normalized.replace(/\b\w/g, (letter) => letter.toUpperCase())
+          : ""
+    }
+  }
 
   const fetchUsers = async () => {
     try {
@@ -88,34 +110,42 @@ export default function UsersPage() {
   }
 
   const getRoleBadge = (role: string) => {
-    switch (normalizeRole(role)) {
+    const normalizedRole = normalizeRole(role)
+
+    switch (normalizedRole) {
       case "dpo":
         return (
           <Badge className="bg-purple-100 text-purple-800">
             <Shield className="w-3 h-3 mr-1" />
-            dpo
+            {formatRoleLabel(role)}
           </Badge>
         )
       case "admin":
         return (
           <Badge className="bg-blue-100 text-blue-800">
             <UsersIcon className="w-3 h-3 mr-1" />
-            admin
+            {formatRoleLabel(role)}
           </Badge>
         )
       case "super admin":
         return (
           <Badge className="bg-red-100 text-red-800">
             <Shield className="w-3 h-3 mr-1" />
-            super admin
+            {formatRoleLabel(role)}
           </Badge>
         )
       case "responsable du traitement":
-        return <Badge className="bg-green-100 text-green-800">responsable du traitement</Badge>
+        return (
+          <Badge className="bg-green-100 text-green-800">
+            {formatRoleLabel(role)}
+          </Badge>
+        )
       case "sous traitant":
-        return <Badge className="bg-gray-100 text-gray-800">sous traitant</Badge>
+        return (
+          <Badge className="bg-gray-100 text-gray-800">{formatRoleLabel(role)}</Badge>
+        )
       default:
-        return <Badge variant="secondary">{role}</Badge>
+        return <Badge variant="secondary">{formatRoleLabel(role) || "—"}</Badge>
     }
   }
 
