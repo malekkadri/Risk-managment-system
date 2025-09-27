@@ -54,11 +54,13 @@ router.put("/:id", auth, authorize("admin", "dpo", "super admin"), async (req, r
   const { nom, role, email, actif } = req.body
 
   try {
+    const actifValue = typeof actif === "boolean" ? (actif ? 1 : 0) : actif
+
     await db.query("UPDATE Utilisateur SET nom = ?, role = ?, email = ?, actif = ? WHERE id = ?", [
       nom,
       role,
       email,
-      actif,
+      actifValue,
       req.params.id,
     ])
 
@@ -66,7 +68,29 @@ router.put("/:id", auth, authorize("admin", "dpo", "super admin"), async (req, r
       req.params.id,
     ])
 
+    if (updatedUser.length === 0) {
+      return res.status(404).json({ msg: "Utilisateur introuvable" })
+    }
+
     res.json(updatedUser[0])
+  } catch (err) {
+    console.error(err.message)
+    res.status(500).send("Erreur serveur")
+  }
+})
+
+// Supprimer un utilisateur
+router.delete("/:id", auth, authorize("admin", "dpo", "super admin"), async (req, res) => {
+  try {
+    const [existing] = await db.query("SELECT id FROM Utilisateur WHERE id = ?", [req.params.id])
+
+    if (existing.length === 0) {
+      return res.status(404).json({ msg: "Utilisateur introuvable" })
+    }
+
+    await db.query("DELETE FROM Utilisateur WHERE id = ?", [req.params.id])
+
+    res.json({ msg: "Utilisateur supprimé" })
   } catch (err) {
     console.error(err.message)
     res.status(500).send("Erreur serveur")

@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
 import { API_BASE_URL } from "@/lib/api"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -21,8 +20,6 @@ export default function UsersPage() {
   const [showDialog, setShowDialog] = useState(false)
   const [editingUser, setEditingUser] = useState<any>(null)
 
-  const router = useRouter()
-
   const role = useRoleGuard(["admin", "dpo", "super admin"])
 
   useEffect(() => {
@@ -35,6 +32,8 @@ export default function UsersPage() {
     filterUsers()
   }, [users, searchTerm])
 
+  const normalizeRole = (role: string | null | undefined) => role?.toLowerCase().trim() || ""
+
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem("token")
@@ -43,7 +42,12 @@ export default function UsersPage() {
       })
       if (res.ok) {
         const data = await res.json()
-        setUsers(data)
+        const formatted = data.map((user: any) => ({
+          ...user,
+          role: user.role || "",
+          actif: Boolean(user.actif),
+        }))
+        setUsers(formatted)
       }
     } catch (error) {
       console.error("Erreur lors de la récupération des utilisateurs:", error)
@@ -58,8 +62,8 @@ export default function UsersPage() {
     if (searchTerm) {
       filtered = filtered.filter(
         (u) =>
-          u.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          u.email.toLowerCase().includes(searchTerm.toLowerCase()),
+          (u.nom || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (u.email || "").toLowerCase().includes(searchTerm.toLowerCase()),
       )
     }
 
@@ -84,7 +88,7 @@ export default function UsersPage() {
   }
 
   const getRoleBadge = (role: string) => {
-    switch (role) {
+    switch (normalizeRole(role)) {
       case "dpo":
         return (
           <Badge className="bg-purple-100 text-purple-800">
@@ -124,8 +128,13 @@ export default function UsersPage() {
   }
 
   const getInitials = (nom: string) => {
+    if (!nom) {
+      return ""
+    }
+
     return nom
       .split(" ")
+      .filter(Boolean)
       .map((n) => n[0])
       .join("")
       .toUpperCase()
@@ -161,7 +170,7 @@ export default function UsersPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">DPO</p>
-                <p className="text-2xl font-bold">{users.filter((u) => u.role === "dpo").length}</p>
+                <p className="text-2xl font-bold">{users.filter((u) => normalizeRole(u.role) === "dpo").length}</p>
               </div>
               <Shield className="h-8 w-8 text-purple-500" />
             </div>
@@ -172,7 +181,7 @@ export default function UsersPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Admins</p>
-                <p className="text-2xl font-bold">{users.filter((u) => u.role === "admin").length}</p>
+                <p className="text-2xl font-bold">{users.filter((u) => normalizeRole(u.role) === "admin").length}</p>
               </div>
               <UsersIcon className="h-8 w-8 text-blue-500" />
             </div>
@@ -183,7 +192,7 @@ export default function UsersPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Responsables du traitement</p>
-                <p className="text-2xl font-bold">{users.filter((u) => u.role === "responsable du traitement").length}</p>
+                <p className="text-2xl font-bold">{users.filter((u) => normalizeRole(u.role) === "responsable du traitement").length}</p>
               </div>
               <UsersIcon className="h-8 w-8 text-green-500" />
             </div>
@@ -255,7 +264,7 @@ export default function UsersPage() {
                   </TableCell>
                   <TableCell className="text-muted-foreground">{user.email}</TableCell>
                   <TableCell>{getRoleBadge(user.role)}</TableCell>
-                  <TableCell>{getStatusBadge(user.actif)}</TableCell>
+                  <TableCell>{getStatusBadge(Boolean(user.actif))}</TableCell>
                   <TableCell className="text-muted-foreground">
                     {new Date(user.cree_le).toLocaleDateString("fr-FR")}
                   </TableCell>
