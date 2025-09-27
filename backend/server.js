@@ -4,6 +4,7 @@ const cors = require("cors")
 const cron = require("node-cron")
 const db = require("./config/db")
 const { checkAlerts } = require("./services/alertService")
+const { ensureRoleEnumValues } = require("./services/userSetup")
 
 const app = express()
 
@@ -13,9 +14,15 @@ app.use(express.json())
 
 // Test de la connexion à la base de données
 db.getConnection()
-  .then((connection) => {
+  .then(async (connection) => {
     console.log("MySQL Connected...")
     connection.release()
+
+    try {
+      await ensureRoleEnumValues()
+    } catch (setupError) {
+      console.error("Erreur lors de la configuration initiale des rôles:", setupError)
+    }
   })
   .catch((err) => console.error("Error connecting to MySQL:", err))
 
