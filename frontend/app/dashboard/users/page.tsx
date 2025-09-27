@@ -20,7 +20,7 @@ export default function UsersPage() {
   const [showDialog, setShowDialog] = useState(false)
   const [editingUser, setEditingUser] = useState<any>(null)
 
-  const role = useRoleGuard(["admin", "dpo", "super admin"])
+  const role = useRoleGuard(["admin", "dpo", "super admin", "responsable du traitement", "sous traitant"])
 
   useEffect(() => {
     if (role) {
@@ -86,6 +86,9 @@ export default function UsersPage() {
 
     return normalized.replace(/\b\w/g, (letter) => letter.toUpperCase())
   }
+
+  const normalizedCurrentRole = normalizeRole(role)
+  const canManageUsers = ["admin", "dpo", "super admin"].includes(normalizedCurrentRole)
 
   const fetchUsers = async () => {
     try {
@@ -218,10 +221,12 @@ export default function UsersPage() {
           <h1 className="text-3xl font-bold tracking-tight">Gestion des Utilisateurs</h1>
           <p className="text-muted-foreground">Gérez les accès et les rôles de votre équipe</p>
         </div>
-        <Button onClick={() => setShowDialog(true)} className="shadow-lg">
-          <UserPlus className="mr-2 h-4 w-4" />
-          Nouvel Utilisateur
-        </Button>
+        {canManageUsers && (
+          <Button onClick={() => setShowDialog(true)} className="shadow-lg">
+            <UserPlus className="mr-2 h-4 w-4" />
+            Nouvel Utilisateur
+          </Button>
+        )}
       </div>
 
       {/* Stats Cards */}
@@ -305,7 +310,7 @@ export default function UsersPage() {
                 <TableHead>Rôle</TableHead>
                 <TableHead>Statut</TableHead>
                 <TableHead>Créé le</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                {canManageUsers && <TableHead className="text-right">Actions</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -329,29 +334,31 @@ export default function UsersPage() {
                   <TableCell className="text-muted-foreground">
                     {new Date(user.cree_le).toLocaleDateString("fr-FR")}
                   </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end space-x-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setEditingUser(user)
-                          setShowDialog(true)
-                        }}
-                        className="hover:bg-blue-50 hover:text-blue-600"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDelete(user.id)}
-                        className="hover:bg-red-50 hover:text-red-600"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
+                  {canManageUsers && (
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end space-x-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setEditingUser(user)
+                            setShowDialog(true)
+                          }}
+                          className="hover:bg-blue-50 hover:text-blue-600"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDelete(user.id)}
+                          className="hover:bg-red-50 hover:text-red-600"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
             </TableBody>
@@ -359,16 +366,18 @@ export default function UsersPage() {
         </CardContent>
       </Card>
 
-      <UserDialog
-        open={showDialog}
-        onOpenChange={setShowDialog}
-        user={editingUser}
-        onSuccess={() => {
-          fetchUsers()
-          setShowDialog(false)
-          setEditingUser(null)
-        }}
-      />
+      {canManageUsers && (
+        <UserDialog
+          open={showDialog}
+          onOpenChange={setShowDialog}
+          user={editingUser}
+          onSuccess={() => {
+            fetchUsers()
+            setShowDialog(false)
+            setEditingUser(null)
+          }}
+        />
+      )}
     </div>
   )
 }
