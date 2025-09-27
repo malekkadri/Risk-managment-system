@@ -6,7 +6,11 @@ const auth = require("../middleware/auth")
 const authorize = require("../middleware/authorize")
 
 // Obtenir tous les utilisateurs
-router.get("/", auth, authorize("admin", "dpo", "super admin"), async (req, res) => {
+router.get(
+  "/",
+  auth,
+  authorize("admin", "dpo", "super admin", "responsable du traitement", "sous traitant"),
+  async (req, res) => {
   try {
     const [users] = await db.query("SELECT id, nom, role, email, actif, cree_le FROM Utilisateur ORDER BY nom")
     res.json(users)
@@ -14,7 +18,8 @@ router.get("/", auth, authorize("admin", "dpo", "super admin"), async (req, res)
     console.error(err.message)
     res.status(500).send("Erreur serveur")
   }
-})
+  },
+)
 
 // Créer un utilisateur
 router.post("/", auth, authorize("admin", "dpo", "super admin"), async (req, res) => {

@@ -42,7 +42,12 @@ const navigation = [
     icon: ShieldCheck,
     roles: ["admin", "dpo", "super admin", "responsable du traitement"],
   },
-  { name: "Utilisateurs", href: "/dashboard/users", icon: Users, roles: ["admin", "dpo", "super admin"] },
+  {
+    name: "Utilisateurs",
+    href: "/dashboard/users",
+    icon: Users,
+    roles: ["admin", "dpo", "super admin", "responsable du traitement", "sous traitant"],
+  },
   {
     name: "Alertes",
     href: "/dashboard/alertes",
