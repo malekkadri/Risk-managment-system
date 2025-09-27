@@ -54,13 +54,32 @@ router.put("/:id", auth, authorize("admin", "dpo", "super admin"), async (req, r
   const { nom, role, email, actif } = req.body
 
   try {
-    const actifValue = typeof actif === "boolean" ? (actif ? 1 : 0) : actif
+    const [existingUser] = await db.query("SELECT nom, role, email, actif FROM Utilisateur WHERE id = ?", [
+      req.params.id,
+    ])
+
+    if (existingUser.length === 0) {
+      return res.status(404).json({ msg: "Utilisateur introuvable" })
+    }
+
+    const currentUser = existingUser[0]
+
+    const updatedNom = typeof nom === "string" && nom.length > 0 ? nom : currentUser.nom
+    const updatedRole = typeof role === "string" && role.length > 0 ? role : currentUser.role
+    const updatedEmail = typeof email === "string" && email.length > 0 ? email : currentUser.email
+
+    const actifValue =
+      typeof actif === "boolean"
+        ? actif
+        : actif !== undefined && actif !== null
+          ? Boolean(actif)
+          : Boolean(currentUser.actif)
 
     await db.query("UPDATE Utilisateur SET nom = ?, role = ?, email = ?, actif = ? WHERE id = ?", [
-      nom,
-      role,
-      email,
-      actifValue,
+      updatedNom,
+      updatedRole,
+      updatedEmail,
+      actifValue ? 1 : 0,
       req.params.id,
     ])
 
