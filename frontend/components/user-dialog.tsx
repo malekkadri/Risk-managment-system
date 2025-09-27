@@ -41,7 +41,7 @@ export function UserDialog({ open, onOpenChange, user, onSuccess }: UserDialogPr
         nom: user.nom || "",
         email: user.email || "",
         role: user.role || "responsable du traitement",
-        actif: user.actif !== undefined ? Boolean(user.actif) : true,
+        actif: user.actif !== undefined ? user.actif : true,
         mot_de_passe: "",
       })
     } else {
