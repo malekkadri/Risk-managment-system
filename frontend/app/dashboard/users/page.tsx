@@ -32,28 +32,59 @@ export default function UsersPage() {
     filterUsers()
   }, [users, searchTerm])
 
-  const normalizeRole = (role: string | null | undefined) =>
-    role?.toLowerCase().replace(/[_-]+/g, " ").replace(/\s+/g, " ").trim() || ""
+  const normalizeRole = (role: string | null | undefined) => {
+    if (!role) {
+      return ""
+    }
+
+    const base = role
+      .toString()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/\p{Diacritic}/gu, "")
+      .replace(/[_-]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim()
+
+    switch (base) {
+      case "superadmin":
+        return "super admin"
+      case "responsable du traitement":
+      case "responsable de traitement":
+      case "responsable traitement":
+      case "responsable":
+        return "responsable du traitement"
+      case "soustraitant":
+      case "sous traitant":
+      case "sous traitants":
+      case "sous-traitant":
+      case "sous-traitants":
+        return "sous traitant"
+      default:
+        return base
+    }
+  }
+
+  const roleLabels: Record<string, string> = {
+    dpo: "DPO",
+    admin: "Admin",
+    "super admin": "Super Admin",
+    "responsable du traitement": "Responsable de traitement",
+    "sous traitant": "Sous-traitant",
+  }
 
   const formatRoleLabel = (role: string | null | undefined) => {
     const normalized = normalizeRole(role)
 
-    switch (normalized) {
-      case "dpo":
-        return "DPO"
-      case "admin":
-        return "Admin"
-      case "super admin":
-        return "Super Admin"
-      case "responsable du traitement":
-        return "Responsable du traitement"
-      case "sous traitant":
-        return "Sous-traitant"
-      default:
-        return normalized
-          ? normalized.replace(/\b\w/g, (letter) => letter.toUpperCase())
-          : ""
+    if (!normalized) {
+      return ""
     }
+
+    if (roleLabels[normalized]) {
+      return roleLabels[normalized]
+    }
+
+    return normalized.replace(/\b\w/g, (letter) => letter.toUpperCase())
   }
 
   const fetchUsers = async () => {
